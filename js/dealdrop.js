@@ -47,49 +47,50 @@ async function initSignup() {
     clearErrors();
 
     const fullName = fullname.value.trim();
-    const usernameRaw = username.value.trim();
-    const password = document.getElementById("password").value;
-    const confirmPassword = confirmPasswordEl.value;
-    const email = document.getElementById("email").value.trim();
+const usernameRaw = username.value.trim();
+const password = document.getElementById("password").value;
+const confirmPassword = document.getElementById("confirmPassword").value; // ✅ FIXED
+const email = document.getElementById("email").value.trim();
 
-    const cleanUsername = usernameRaw.toLowerCase();
+const cleanUsername = usernameRaw.toLowerCase();
 
-    let hasError = false;
+let hasError = false;
 
-    if (fullName.length < 2) {
-      showError("err-fullname", "Full name too short.");
-      hasError = true;
-    }
+if (fullName.length < 2) {
+  showError("err-fullname", "Full name too short.");
+  hasError = true;
+}
 
-    if (cleanUsername.length < 3) {
-      showError("err-username", "Username must be 3+ characters.");
-      hasError = true;
-    }
+if (cleanUsername.length < 3) {
+  showError("err-username", "Username must be 3+ characters.");
+  hasError = true;
+}
 
-    const passErr = validatePassword(password, confirmPassword);
-    if (passErr) {
-      showError("err-password", passErr);
-      hasError = true;
-    }
+const passErr = validatePassword(password, confirmPassword);
+if (passErr) {
+  showError("err-password", passErr);
+  hasError = true;
+}
 
-    if (!email.includes("@")) {
-      showError("err-email", "Invalid email.");
-      hasError = true;
-    }
+if (!email.includes("@")) {
+  showError("err-email", "Invalid email.");
+  hasError = true;
+}
 
-    if (hasError) return;
+if (hasError) return;
 
-    // ---- Check duplicate email ----
-    const { data: emailExists } = await supabaseClient
-      .from("users")
-      .select("id")
-      .eq("email", email)
-      .maybeSingle();
+// ---- Check duplicate email ----
+const { data: emailExists } = await supabaseClient
+  .from("users")
+  .select("id")
+  .eq("email", email)
+  .maybeSingle();
 
-    if (emailExists) {
-      showError("err-email", "Email already registered.");
-      return;
-    }
+if (emailExists) {
+  showError("err-email", "Email already registered.");
+  return;
+}
+
 
     // ---- Check duplicate username ----
     const { data: usernameExists } = await supabaseClient
