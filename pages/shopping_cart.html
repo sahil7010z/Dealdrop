@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart - DealDrop</title>
     <link rel="stylesheet" href="../css/main.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   
-  <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fdealdrop6605back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.10"></script>
-  <script type="module" defer src="https://static.rocket.new/rocket-shot.js?v=0.0.1"></script>
+  
   </head>
 <body class="bg-background text-text-primary">
     <!-- Navigation Header -->
@@ -102,17 +99,20 @@
                 </a>
 
                 <!-- Cart Icon with Badge -->
-                <a href="shopping_cart.html" class="relative text-text-secondary hover:text-secondary transition-colors duration-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path 
-                            stroke-linecap="round" 
-                            stroke-linejoin="round" 
-                            stroke-width="2" 
-                            d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0h9"
-                        ></path>
-                    </svg>
-                    <span class="absolute -top-2 -right-2 bg-secondary text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">3</span>
-                </a>
+                <a href="shopping_cart.html" class="relative">
+    <svg class="w-6 h-6 text-text-secondary hover:text-secondary transition-colors duration-300" 
+         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0h9"/>
+    </svg>
+
+    <!--  Glowing Dot (initially hidden) -->
+    <span id="cartDot"
+          class="hidden absolute -top-1 -right-1 w-3 h-3 rounded-full 
+                 bg-[#12f59f] shadow-[0_0_8px_#12f59f,0_0_12px_#12f59f]">
+    </span>
+</a>
+
 
                 <!-- Account -->
                 <a href="user_account_dashboard.html" class="text-text-secondary hover:text-secondary transition-colors duration-300">
@@ -401,95 +401,352 @@
     </div>
   </div>
 </footer>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/dealdrop.js"></script>
 <script>
-(() => {
-  const STORAGE_KEY = 'cart';
-  const SAVED_KEY = 'dealdrop_saved_items';
-  const TAX_RATE = 0.18; // 18% GST
-  const q = (s, r=document)=> r.querySelector(s);
-  const qa = (s, r=document)=> Array.from((r||document).querySelectorAll(s));
-  const formatINR = (n) => '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+(async () => {
+  // ===== REQUIRE supabaseClient FROM dealdrop.js =====
+  if (typeof supabaseClient === "undefined") {
+    console.error("supabaseClient not found. Make sure dealdrop.js is loaded BEFORE this script.");
+    return;
+  }
 
-  // DOM targets (from your provided HTML)
-  const cartItemsContainer = q('#cartItems');
-  const savedForLaterSection = q('#savedForLaterSection');
-  const savedForLaterContainer = q('#savedForLater');
-  const subtotalEl = q('#subtotal');
-  const taxEl = q('#tax');
-  const totalEl = q('#total');
-  const discountRow = q('#discountRow');
-  const discountValueEl = q('#discountValue');
-  const promoInput = q('#promoInput');
-  const promoApplyBtn = q('#promoApply');
-  const promoMessage = q('#promoMessage');
-  const promoInvalid = q('#promoInvalid');
+  const api = supabaseClient;
+  const TAX_RATE = 0.18;               // 18% GST
+  const SAVED_KEY = "dealdrop_saved_items";
 
-  // Undo toast
-  const undoToast = q('#undoToast');
-  const undoMessage = q('#undoMessage');
-  const undoBtn = q('#undoBtn');
+  // ---------- Small helpers ----------
+  const $  = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+  const formatINR = n =>
+    "₹" + Number(n || 0).toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  const safe = v => (v == null ? "" : String(v));
+  const escapeHtml = s =>
+    safe(s)
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#039;");
 
-  // mini-cart badge (optional)
-  const headerBadge = document.getElementById('cartCount') || document.getElementById('cart-count') || document.querySelector('.cart-badge');
+  // ---------- DOM elements ----------
+  const cartItemsContainer     = $("#cartItems");
+  const savedForLaterSection   = $("#savedForLaterSection");
+  const savedForLaterContainer = $("#savedForLater");
+  const subtotalEl             = $("#subtotal");
+  const taxEl                  = $("#tax");
+  const totalEl                = $("#total");
+  const discountRow            = $("#discountRow");
+  const discountValueEl        = $("#discountValue");
+  const promoInput             = $("#promoInput");
+  const promoApplyBtn          = $("#promoApply");
+  const promoMessage           = $("#promoMessage");
+  const promoInvalid           = $("#promoInvalid");
+  const undoToast              = $("#undoToast");
+  const undoMessage            = $("#undoMessage");
+  const undoBtn                = $("#undoBtn");
+  const headerBadge            =
+    document.getElementById("cartCount") ||
+    document.getElementById("cart-count") ||
+    document.querySelector(".cart-badge");
 
-  // Storage helpers
-  function loadCart() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
-      const arr = JSON.parse(raw);
-      return arr.map(item => ({ quantity: Number(item.quantity || 1), ...item }));
-    } catch(e) {
-      console.error('Failed to load cart', e);
-      return [];
+  // ---------- Auth + cart state ----------
+  let currentUser = null;       // supabase auth user
+  let cartId      = null;       // user_cart.id
+  let cartItems   = [];         // [{cartItemId, productId, quantity, ...productFields}]
+  let savedItems  = JSON.parse(localStorage.getItem(SAVED_KEY) || "{}");
+  let lastRemoved = null;
+  let undoTimer   = null;
+
+  // ---------- AUTH HELPERS ----------
+  async function loadCurrentUser() {
+    const { data, error } = await api.auth.getUser();
+    if (error) {
+      console.warn("getUser error:", error.message);
+      return null;
+    }
+    currentUser = data?.user || null;
+    return currentUser;
+  }
+
+  // Make sure a row exists in public.users (to satisfy fk_cart_user)
+  async function ensureAppUser() {
+    if (!currentUser) return null;
+
+    const email =
+      currentUser.email || null;
+    const full_name =
+      currentUser.user_metadata?.full_name ||
+      currentUser.user_metadata?.name ||
+      null;
+    const username =
+      currentUser.user_metadata?.username ||
+      currentUser.user_metadata?.preferred_username ||
+      (email ? email.split("@")[0] : null);
+    const provider =
+      currentUser.app_metadata?.provider || "email";
+
+    const { error } = await api
+      .from("users")
+      .upsert(
+        {
+          id: currentUser.id,
+          email,
+          full_name,
+          username: username ? username.toLowerCase() : null,
+          provider,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "id" }
+      );
+
+    if (error) {
+      console.error("users upsert error:", error.message);
     }
   }
-  function saveCart(arr) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-    // also update header mini badge if present (try best effort)
-    updateHeaderBadge(arr);
+
+  // Ensure there is one cart row for this user
+  async function ensureCart() {
+    if (!currentUser) return null;
+    if (cartId) return cartId;
+
+    await ensureAppUser(); // 🔑 fixes fk_cart_user 409
+
+    // Look for existing cart
+    const { data: existing, error } = await api
+      .from("user_cart")
+      .select("id")
+      .eq("user_id", currentUser.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("user_cart select error:", error.message);
+    }
+
+    if (existing) {
+      cartId = existing.id;
+      return cartId;
+    }
+
+    // Create new cart
+    const { data: created, error: insertErr } = await api
+      .from("user_cart")
+      .insert({ user_id: currentUser.id })
+      .select("id")
+      .single();
+
+    if (insertErr) {
+      console.error("Cart create error:", insertErr.message);
+      return null;
+    }
+
+    cartId = created.id;
+    return cartId;
   }
 
-  // State
-  let cart = loadCart(); // array of {id, name, price, image, brand, tags, unit, quantity}
-  let savedItems = JSON.parse(localStorage.getItem(SAVED_KEY) || '{}');
-  let lastRemoved = null;
-  let undoTimer = null;
+  // ---------- CART ITEMS FROM DB ----------
+  async function loadCartItems() {
+    if (!currentUser) {
+      cartItems = [];
+      renderCart();
+      return;
+    }
 
-  // Render cart items
+    const id = await ensureCart();
+    if (!id) {
+      cartItems = [];
+      renderCart();
+      return;
+    }
+
+    // Join user_cart_items with products
+    const { data, error } = await api
+      .from("user_cart_items")
+      .select(`
+        id,
+        product_id,
+        quantity,
+        products (
+          id,
+          name,
+          price,
+          unit,
+          brand,
+          tags,
+          rating,
+          image_url,
+          category_slug
+        )
+      `)
+      .eq("cart_id", id);
+
+    if (error) {
+      console.error("user_cart_items error:", error.message);
+      cartItems = [];
+      renderCart();
+      return;
+    }
+
+    cartItems = (data || []).map(row => {
+      const p = row.products || {};
+      const tags = Array.isArray(p.tags) ? p.tags : [];
+      return {
+        cartItemId: row.id,
+        productId : row.product_id,
+        quantity  : Number(row.quantity || 1),
+        name      : p.name,
+        price     : Number(p.price || 0),
+        unit      : p.unit || "",
+        brand     : p.brand || "",
+        tags,
+        rating    : p.rating ? Number(p.rating) : 4,
+        image     : p.image_url,
+        category  : p.category_slug || ""
+      };
+    });
+
+    renderCart();
+  }
+
+  async function updateCartItemQuantity(cartItemId, newQty) {
+    if (!cartItemId || !cartId) return;
+    if (newQty <= 0) {
+      await removeCartItem(cartItemId);
+      return;
+    }
+
+    const { error } = await api
+      .from("user_cart_items")
+      .update({ quantity: newQty, updated_at: new Date().toISOString() })
+      .eq("id", cartItemId);
+
+    if (error) {
+      console.error("update quantity error:", error.message);
+      return;
+    }
+
+    await loadCartItems();
+  }
+
+  async function removeCartItem(cartItemId) {
+    const idx = cartItems.findIndex(it => it.cartItemId === cartItemId);
+    if (idx === -1) return;
+
+    lastRemoved = { ...cartItems[idx] };
+
+    const { error } = await api
+      .from("user_cart_items")
+      .delete()
+      .eq("id", cartItemId);
+
+    if (error) {
+      console.error("remove item error:", error.message);
+      return;
+    }
+
+    await loadCartItems();
+    showUndoToast(`${lastRemoved.name} removed`);
+  }
+
+  async function undoRemove() {
+    if (!lastRemoved || !cartId) return;
+
+    const { error } = await api
+      .from("user_cart_items")
+      .insert({
+        cart_id   : cartId,
+        product_id: lastRemoved.productId,
+        quantity  : lastRemoved.quantity || 1
+      });
+
+    if (error) {
+      console.error("undo insert error:", error.message);
+      return;
+    }
+
+    lastRemoved = null;
+    await loadCartItems();
+  }
+
+  // ---------- RENDER HELPERS ----------
+  function updateHeaderBadge() {
+    if (!headerBadge) return;
+    const count = cartItems.reduce(
+      (sum, it) => sum + Number(it.quantity || 0),
+      0
+    );
+    headerBadge.textContent = count;
+  }
+
+  function updateOrderSummary() {
+    const subtotal = cartItems.reduce(
+      (s, it) => s + Number(it.price) * Number(it.quantity || 1),
+      0
+    );
+    const tax   = subtotal * TAX_RATE;
+    const total = subtotal + tax;
+
+    if (subtotalEl) subtotalEl.textContent = formatINR(subtotal);
+    if (taxEl)      taxEl.textContent      = formatINR(tax);
+    if (totalEl)    totalEl.textContent    = formatINR(total);
+  }
+
   function renderCart() {
-    cartItemsContainer.innerHTML = '';
-    if (!cart.length) {
-      cartItemsContainer.innerHTML = `<div class="card p-6 text-center text-text-secondary">Your cart is empty. <a href="categories_page.html" class="text-secondary">Browse products</a></div>`;
+    cartItemsContainer.innerHTML = "";
+
+    if (!cartItems.length) {
+      cartItemsContainer.innerHTML =
+        `<div class="card p-6 text-center text-text-secondary">
+           Your cart is empty.
+           <a href="categories_page.html" class="text-secondary">Browse products</a>
+         </div>`;
       updateOrderSummary();
+      updateHeaderBadge();
       renderSavedForLater();
       return;
     }
 
-    cart.forEach(item => {
-      const idAttr = item.id;
-      const qty = Number(item.quantity || 1);
-      const itemTotal = Number(item.price) * qty;
-      const card = document.createElement('div');
-      card.className = 'card cart-item';
+    cartItems.forEach(item => {
+      const idAttr = item.cartItemId;
+      const qty    = Number(item.quantity || 1);
+      const itemTotal = item.price * qty;
+
+      const card = document.createElement("div");
+      card.className = "card cart-item";
       card.dataset.itemId = idAttr;
+
       card.innerHTML = `
         <div class="flex flex-col md:flex-row gap-4">
           <div class="w-full md:w-32 h-32 rounded-lg overflow-hidden flex-shrink-0">
-            <img src="${escapeHtml(item.image||'')}" alt="${escapeHtml(item.name||'')}" class="w-full h-full object-cover" loading="lazy">
+            <img src="${escapeHtml(item.image || "")}"
+                 alt="${escapeHtml(item.name || "")}"
+                 class="w-full h-full object-cover" loading="lazy">
           </div>
+
           <div class="flex-1">
             <div class="flex justify-between items-start mb-2">
               <div>
                 <h3 class="text-lg font-semibold">${escapeHtml(item.name)}</h3>
-                <p class="text-text-secondary text-sm">${escapeHtml(item.brand || '')} · ${escapeHtml(item.unit || '')}</p>
+                <p class="text-text-secondary text-sm">
+                  ${escapeHtml(item.brand || "")} · ${escapeHtml(item.unit || "")}
+                </p>
                 <div class="flex items-center space-x-2 mt-1">
-                  ${(Array.isArray(item.tags)? item.tags.slice(0,3).map(t=>`<span class="bg-secondary/20 text-secondary text-xs px-2 py-1 rounded">${escapeHtml(t)}</span>`).join(' ') : '')}
-                  <span class="text-text-secondary text-xs">${escapeHtml(item.category||'')}</span>
+                  ${(item.tags || []).slice(0,3).map(
+                    t => `<span class="bg-secondary/20 text-secondary text-xs px-2 py-1 rounded">
+                            ${escapeHtml(t)}
+                          </span>`
+                  ).join(" ")}
+                  <span class="text-text-secondary text-xs">
+                    ${escapeHtml(item.category || "")}
+                  </span>
                 </div>
               </div>
-              <button class="text-text-secondary hover:text-error transition-colors duration-300 remove-item" data-item-id="${idAttr}" title="Remove">
+
+              <button class="text-text-secondary hover:text-error transition-colors duration-300 remove-item"
+                      data-item-id="${idAttr}" title="Remove">
                 ✕
               </button>
             </div>
@@ -497,60 +754,58 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-3">
                 <div class="flex items-center border border-surface rounded-lg">
-                  <button class="p-2 hover:bg-surface quantity-btn" data-action="decrease" data-item-id="${idAttr}">-</button>
-                  <span class="px-4 py-2 font-semibold quantity-display" data-item-id="${idAttr}">${qty}</span>
-                  <button class="p-2 hover:bg-surface quantity-btn" data-action="increase" data-item-id="${idAttr}">+</button>
+                  <button class="p-2 hover:bg-surface quantity-btn"
+                          data-action="decrease" data-item-id="${idAttr}">-</button>
+                  <span class="px-4 py-2 font-semibold quantity-display"
+                        data-item-id="${idAttr}">${qty}</span>
+                  <button class="p-2 hover:bg-surface quantity-btn"
+                          data-action="increase" data-item-id="${idAttr}">+</button>
                 </div>
-                <button class="text-text-secondary hover:text-secondary text-sm save-later" data-item-id="${idAttr}">Save for Later</button>
+                <button class="text-text-secondary hover:text-secondary text-sm save-later"
+                        data-item-id="${idAttr}">
+                  Save for Later
+                </button>
               </div>
 
               <div class="text-right">
-                <div class="text-lg font-bold item-total" data-item-id="${idAttr}">${formatINR(itemTotal)}</div>
-                <div class="text-text-secondary text-sm">${formatINR(item.price)} each</div>
+                <div class="text-lg font-bold item-total"
+                     data-item-id="${idAttr}">${formatINR(itemTotal)}</div>
+                <div class="text-text-secondary text-sm">
+                  ${formatINR(item.price)} each
+                </div>
               </div>
             </div>
           </div>
         </div>
       `;
+
       cartItemsContainer.appendChild(card);
     });
 
     updateOrderSummary();
-    saveCart(cart);
+    updateHeaderBadge();
   }
 
-  // Order summary
-  function updateOrderSummary() {
-    const subtotal = cart.reduce((s,it)=> s + (Number(it.price) * Number(it.quantity||1)), 0);
-    const tax = subtotal * TAX_RATE;
-    const total = subtotal + tax;
-    if (subtotalEl) subtotalEl.textContent = formatINR(subtotal);
-    if (taxEl) taxEl.textContent = formatINR(tax);
-    if (totalEl) totalEl.textContent = formatINR(total);
-  }
-
-  // Header badge
-  function updateHeaderBadge(arr) {
-    if (!headerBadge) return;
-    const cnt = arr.reduce((s,it) => s + (Number(it.quantity||1)), 0);
-    try { headerBadge.textContent = cnt; } catch(e){ /* ignore */ }
-  }
-
-  // Saved for later render
+  // ---------- SAVED FOR LATER (localStorage only) ----------
   function renderSavedForLater() {
     if (!savedForLaterSection || !savedForLaterContainer) return;
     const keys = Object.keys(savedItems || {});
     if (!keys.length) {
-      savedForLaterSection.style.display = 'none';
+      savedForLaterSection.style.display = "none";
       return;
     }
-    savedForLaterSection.style.display = 'block';
-    savedForLaterContainer.innerHTML = '';
+    savedForLaterSection.style.display = "block";
+    savedForLaterContainer.innerHTML = "";
+
     keys.forEach(k => {
       const it = savedItems[k];
-      const div = document.createElement('div');
-      div.className = 'card flex items-center gap-4';
-      div.innerHTML = `<div class="w-16 h-16 overflow-hidden"><img src="${escapeHtml(it.image||'')}" class="w-full h-full object-cover"></div>
+      const div = document.createElement("div");
+      div.className = "card flex items-center gap-4";
+      div.innerHTML = `
+        <div class="w-16 h-16 overflow-hidden rounded">
+          <img src="${escapeHtml(it.image || "")}"
+               class="w-full h-full object-cover">
+        </div>
         <div class="flex-1">
           <div class="font-semibold">${escapeHtml(it.name)}</div>
           <div class="text-text-secondary text-sm">${formatINR(it.price)}</div>
@@ -562,188 +817,178 @@
     });
   }
 
-  // Event delegation
-  document.addEventListener('click', (e) => {
+  // ---------- UNDO TOAST ----------
+  function showUndoToast(msg) {
+    if (!undoToast) return;
+    undoMessage.textContent = msg;
+    undoToast.classList.remove("translate-y-full");
+    undoToast.style.transform = "translateY(0)";
+    if (undoTimer) clearTimeout(undoTimer);
+    undoTimer = setTimeout(() => {
+      hideUndoToast();
+      lastRemoved = null;
+    }, 5000);
+  }
+
+  function hideUndoToast() {
+    if (!undoToast) return;
+    undoToast.style.transform = "translateY(100%)";
+  }
+
+  // ---------- PROMO CODES ----------
+  function applyPromo(code) {
+    const codes = { welcome10: 0.10, fresh15: 0.15, organic20: 0.20 };
+    const factor = codes[code.toLowerCase()];
+    if (!factor) {
+      promoInvalid?.classList.remove("hidden");
+      setTimeout(() => promoInvalid?.classList.add("hidden"), 2500);
+      return;
+    }
+
+    const subtotal = cartItems.reduce(
+      (s, it) => s + Number(it.price) * Number(it.quantity || 1),
+      0
+    );
+    const discountValue = subtotal * factor;
+    const discountedSubtotal = Math.max(0, subtotal - discountValue);
+    const tax = discountedSubtotal * TAX_RATE;
+    const total = discountedSubtotal + tax;
+
+    if (discountRow && discountValueEl) {
+      discountRow.classList.remove("hidden");
+      discountValueEl.textContent = "-" + formatINR(discountValue);
+    }
+    if (subtotalEl) subtotalEl.textContent = formatINR(discountedSubtotal);
+    if (taxEl)      taxEl.textContent      = formatINR(tax);
+    if (totalEl)    totalEl.textContent    = formatINR(total);
+
+    promoMessage?.classList.remove("hidden");
+    setTimeout(() => promoMessage?.classList.add("hidden"), 2500);
+    if (promoInput) promoInput.disabled = true;
+    if (promoApplyBtn) {
+      promoApplyBtn.disabled = true;
+      promoApplyBtn.textContent = "Applied";
+    }
+  }
+
+  // ---------- EVENT HANDLERS ----------
+  document.addEventListener("click", async (e) => {
     // quantity buttons
-    const qbtn = e.target.closest('.quantity-btn');
+    const qbtn = e.target.closest(".quantity-btn");
     if (qbtn) {
+      const id = Number(qbtn.dataset.itemId);
       const action = qbtn.dataset.action;
-      const id = qbtn.dataset.itemId;
-      const idx = cart.findIndex(it => String(it.id) === String(id));
-      if (idx === -1) return;
-      const disp = document.querySelector(`.quantity-display[data-item-id="${id}"]`);
-      if (!disp) return;
-      let qv = Number(disp.textContent);
-      if (action === 'increase') qv++;
-      else if (action === 'decrease' && qv>1) qv--;
-      else return;
-      disp.textContent = qv;
-      cart[idx].quantity = qv;
-      const itemTotalEl = document.querySelector(`.item-total[data-item-id="${id}"]`);
-      if (itemTotalEl) itemTotalEl.textContent = formatINR(Number(cart[idx].price) * qv);
-      saveCart(cart);
-      updateOrderSummary();
+      const item = cartItems.find(it => it.cartItemId === id);
+      if (!item) return;
+
+      let newQty = Number(item.quantity || 1);
+      if (action === "increase") newQty++;
+      else if (action === "decrease") newQty = Math.max(1, newQty - 1);
+
+      await updateCartItemQuantity(id, newQty);
       return;
     }
 
     // remove item
-    const rem = e.target.closest('.remove-item');
+    const rem = e.target.closest(".remove-item");
     if (rem) {
-      const id = rem.dataset.itemId;
-      const idx = cart.findIndex(it => String(it.id) === String(id));
-      if (idx === -1) return;
-      lastRemoved = { item: cart[idx], index: idx };
-      cart.splice(idx,1);
-      const el = document.querySelector(`.cart-item[data-item-id="${id}"]`);
-      if (el) {
-        el.style.transition = 'opacity 220ms, transform 220ms';
-        el.style.opacity = '0';
-        el.style.transform = 'translateX(-12px)';
-        setTimeout(()=> { if(el.parentNode) el.remove(); }, 240);
-      }
-      saveCart(cart);
-      updateOrderSummary();
-      showUndoToast(`${lastRemoved.item.name} removed`);
+      const id = Number(rem.dataset.itemId);
+      await removeCartItem(id);
       return;
     }
 
     // save for later
-    const sfl = e.target.closest('.save-later');
+    const sfl = e.target.closest(".save-later");
     if (sfl) {
-      const id = sfl.dataset.itemId;
-      const idx = cart.findIndex(it=>String(it.id)===String(id));
-      if (idx === -1) return;
-      savedItems[id] = cart[idx];
-      localStorage.setItem(SAVED_KEY, JSON.stringify(savedItems));
-      cart.splice(idx,1);
-      const el = document.querySelector(`.cart-item[data-item-id="${id}"]`);
-      if (el) {
-        el.style.opacity='0';
-        el.style.transform='translateX(12px)';
-        setTimeout(()=> el.remove(), 220);
-      }
-      saveCart(cart);
-      updateOrderSummary();
-      renderSavedForLater();
-      return;
-    }
-
-    // undo button (toast)
-    if (e.target.closest('#undoBtn')) {
-      if (!lastRemoved) return;
-      const idx = (typeof lastRemoved.index === 'number') ? lastRemoved.index : cart.length;
-      cart.splice(idx, 0, lastRemoved.item);
-      saveCart(cart);
-      renderCart();
-      hideUndoToast();
-      lastRemoved = null;
-      return;
-    }
-
-    // add back saved item
-    const addSaved = e.target.closest('.add-saved-back');
-    if (addSaved) {
-      const id = addSaved.dataset.id;
-      const item = savedItems[id];
+      const id = Number(sfl.dataset.itemId);
+      const item = cartItems.find(it => it.cartItemId === id);
       if (!item) return;
-      // merge if exists
-      const existingIdx = cart.findIndex(it => String(it.id)===String(id));
-      if (existingIdx > -1) cart[existingIdx].quantity = Number(cart[existingIdx].quantity||1) + Number(item.quantity||1);
-      else cart.push({...item, quantity: Number(item.quantity||1)||1});
-      delete savedItems[id];
+
+      savedItems[id] = {
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        quantity: item.quantity
+      };
       localStorage.setItem(SAVED_KEY, JSON.stringify(savedItems));
-      saveCart(cart);
-      renderCart();
+      await removeCartItem(id);
       renderSavedForLater();
+      return;
+    }
+
+    // undo button
+    if (e.target.closest("#undoBtn")) {
+      await undoRemove();
+      hideUndoToast();
+      return;
+    }
+
+    // add saved back
+    const addSaved = e.target.closest(".add-saved-back");
+    if (addSaved) {
+      const key = addSaved.dataset.id;
+      const it = savedItems[key];
+      if (!it || !cartId) return;
+
+      // Insert new cart item
+      const { error } = await api
+        .from("user_cart_items")
+        .insert({
+          cart_id   : cartId,
+          product_id: it.productId || it.product_id || null, // if you store it later
+          quantity  : it.quantity || 1
+        });
+
+      if (error) console.error("add saved back error:", error.message);
+
+      delete savedItems[key];
+      localStorage.setItem(SAVED_KEY, JSON.stringify(savedItems));
+
+      await loadCartItems();
+      renderSavedForLater();
+      return;
+    }
+
+    // apply offer cards
+    const offerBtn = e.target.closest(".applyOffer");
+    if (offerBtn) {
+      const code = offerBtn.dataset.code;
+      if (promoInput) promoInput.value = code;
+      setTimeout(() => promoApplyBtn?.click(), 150);
     }
   });
 
-  // Promo codes
   if (promoApplyBtn) {
-    promoApplyBtn.addEventListener('click', () => {
-      const code = (promoInput?.value || '').trim().toLowerCase();
-      const valid = { 'welcome10': 0.10, 'fresh15': 0.15, 'organic20': 0.20 };
-      if (!code || !valid[code]) {
-        if (promoInvalid) { promoInvalid.classList.remove('hidden'); setTimeout(()=>promoInvalid.classList.add('hidden'), 2500); }
-        return;
-      }
-      const discountFactor = valid[code];
-      const subtotal = cart.reduce((s,it)=> s + (Number(it.price)*Number(it.quantity||1)),0);
-      const discountValue = subtotal * discountFactor;
-      const discountedSubtotal = Math.max(0, subtotal - discountValue);
-      const tax = discountedSubtotal * TAX_RATE;
-      const total = discountedSubtotal + tax;
-      // update UI
-      if (discountRow && discountValueEl) {
-        discountRow.classList.remove('hidden');
-        discountValueEl.textContent = `-${formatINR(discountValue)}`;
-      }
-      if (subtotalEl) subtotalEl.textContent = formatINR(discountedSubtotal);
-      if (taxEl) taxEl.textContent = formatINR(tax);
-      if (totalEl) totalEl.textContent = formatINR(total);
-      if (promoMessage) { promoMessage.classList.remove('hidden'); setTimeout(()=>promoMessage.classList.add('hidden'), 2500); }
-      // disable input
-      if (promoInput) promoInput.disabled = true;
-      promoApplyBtn.disabled = true;
-      promoApplyBtn.textContent = 'Applied';
+    promoApplyBtn.addEventListener("click", () => {
+      const code = promoInput?.value || "";
+      if (!code) return;
+      applyPromo(code);
     });
   }
 
-  // Undo toast helpers
-  function showUndoToast(msg) {
-    if (!undoToast) return;
-    undoMessage.textContent = msg;
-    undoToast.classList.remove('translate-y-full');
-    undoToast.style.transform = 'translateY(0)';
-    if (undoTimer) clearTimeout(undoTimer);
-    undoTimer = setTimeout(()=> { hideUndoToast(); lastRemoved=null; }, 5000);
-  }
-  function hideUndoToast() {
-    if (!undoToast) return;
-    undoToast.style.transform = 'translateY(100%)';
-  }
+  // ---------- INIT ----------
+  async function init() {
+    await loadCurrentUser();
 
-  // Render initial
-  function renderInitial() {
-    // ensure cart items have quantity numbers
-    cart = cart.map(it => ({ quantity: Number(it.quantity||1), ...it }));
-    renderCart();
+    if (!currentUser) {
+      // not logged in → show empty cart message
+      cartItemsContainer.innerHTML =
+        `<div class="card p-6 text-center text-text-secondary">
+           Please <a href="login.html" class="text-secondary">login</a> to view your cart.
+         </div>`;
+      return;
+    }
+
+    await ensureCart();
+    await loadCartItems();
     renderSavedForLater();
-    updateHeaderBadge(cart);
   }
 
-  // Utility escape
-  function escapeHtml(s){ if (!s && s!==0) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
-
-  // Init on DOM ready
-  document.addEventListener('DOMContentLoaded', () => {
-    renderInitial();
-  });
-  // APPLY PROMO FROM OFFER LIST
-document.addEventListener("click", function (e) {
-  const btn = e.target.closest(".applyOffer");
-  if (!btn) return;
-
-  const code = btn.dataset.code;
-  const promoInput = document.getElementById("promoInput");
-  const promoApply = document.getElementById("promoApply");
-
-  if (promoInput) promoInput.value = code;
-
-  // simulate click on apply button
-  setTimeout(() => {
-    promoApply?.click();
-  }, 200);
-});
-
-  // Expose for debugging
-  window._dealdrop_cart = {
-    get: ()=>cart,
-    set: (c)=>{ cart=c; saveCart(cart); renderCart(); },
-    clear: ()=>{ cart=[]; saveCart(cart); renderCart(); }
-  };
+  document.addEventListener("DOMContentLoaded", init);
 })();
 </script>
-<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+
+
+
 </body>
 </html>
