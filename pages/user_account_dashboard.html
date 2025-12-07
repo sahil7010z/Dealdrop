@@ -1,1064 +1,2541 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Account - DealDrop</title>
-    <link rel="stylesheet" href="../css/main.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  
-  <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fdealdrop6605back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.10"></script>
-  <script type="module" defer src="https://static.rocket.new/rocket-shot.js?v=0.0.1"></script>
-  </head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <style>
+    .card {
+  position: relative;
+}
+
+.card button {
+  white-space: nowrap;
+}
+
+  </style>
+  <title>My Account - DealDrop</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/dealdrop.js"></script>
+</head>
+
 <body class="bg-background text-text-primary">
-    <!-- Navigation Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-surface">
-        <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
-            <!-- Logo -->
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center">
-                    <span class="text-black font-bold text-xl">D</span>
-                </div>
-                <span class="text-2xl font-bold text-text-primary">DealDrop</span>
+  <!-- ================== NAVBAR ================== -->
+  <header
+    class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-surface"
+  >
+    <nav
+      class="container mx-auto px-4 py-4 flex items-center justify-between"
+    >
+      <!-- Logo -->
+      <div class="flex items-center space-x-3">
+        <div
+          class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center"
+        >
+          <span class="text-black font-bold text-xl">D</span>
+        </div>
+        <span class="text-2xl font-bold text-text-primary">DealDrop</span>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center space-x-8">
+        <a
+          href="homepage.html"
+          class="text-text-secondary hover:text-secondary transition-colors duration-300"
+          >Home</a
+        >
+        <a
+          href="categories_page.html"
+          class="text-text-secondary hover:text-secondary transition-colors duration-300"
+          >Categories</a
+        >
+        <a
+          href="javascript:void(0)"
+          class="text-text-secondary hover:text-secondary transition-colors duration-300"
+          >About</a
+        >
+        <a
+          href="javascript:void(0)"
+          class="text-text-secondary hover:text-secondary transition-colors duration-300"
+          >Contact</a
+        >
+      </div>
+
+      <!-- User Actions -->
+      <div class="hidden md:flex items-center space-x-4">
+        <!-- Cart with glowing dot (badge optional) -->
+        <a
+          href="shopping_cart.html"
+          class="relative text-text-secondary hover:text-secondary transition-colors duration-300"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0h9"
+            ></path>
+          </svg>
+
+          <!-- Glowing dot – JS will show/hide based on cart items -->
+          <span
+            id="cartDot"
+            class="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-secondary shadow-[0_0_8px_rgba(245,208,54,0.9)] hidden"
+          ></span>
+        </a>
+
+        <a href="user_account_dashboard.html" class="text-secondary font-semibold"
+          >My Account</a
+        >
+      </div>
+
+      <!-- Mobile Menu Button (just icon for now) -->
+      <button class="md:hidden text-text-primary" id="mobileMenuButton">
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          ></path>
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- ================== MAIN CONTENT ================== -->
+  <main class="pt-20 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- ========== SIDEBAR ========== -->
+        <aside class="lg:w-1/4">
+          <div class="card sticky top-24">
+            <!-- User Profile Header -->
+            <div class="text-center mb-6 pb-6 border-b border-surface">
+              <div
+                class="w-20 h-20 rounded-full overflow-hidden mx-auto mb-4 bg-surface"
+              >
+                <img
+                  id="profileAvatar"
+                  src="https://img.rocket.new/generatedImages/rocket_gen_img_1902b0ce4-1762273505171.png"
+                  alt="Profile picture"
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                  onerror="this.src='https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150'; this.onerror=null;"
+                />
+              </div>
+              <h2 id="profileName" class="text-xl font-semibold mb-1">User</h2>
+              <p
+                id="profileEmail"
+                class="text-text-secondary text-sm break-all"
+              >
+                loading…
+              </p>
+              <div class="flex items-center justify-center mt-2">
+                <div class="w-2 h-2 bg-secondary rounded-full mr-2"></div>
+                <span
+                  id="membershipLabel"
+                  class="text-secondary text-sm font-medium"
+                  >Member</span
+                >
+              </div>
             </div>
 
-            <!-- Desktop Navigation -->
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="homepage.html" class="text-text-secondary hover:text-secondary transition-colors duration-300">Home</a>
-                <a href="categories_page.html" class="text-text-secondary hover:text-secondary transition-colors duration-300">Categories</a>
-                <a href="javascript:void(0)" class="text-text-secondary hover:text-secondary transition-colors duration-300">About</a>
-                <a href="javascript:void(0)" class="text-text-secondary hover:text-secondary transition-colors duration-300">Contact</a>
-            </div>
-
-            <!-- User Actions -->
-            <div class="hidden md:flex items-center space-x-4">
-                <a href="shopping_cart.html" class="relative text-text-secondary hover:text-secondary transition-colors duration-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6"></path>
-                    </svg>
-                    <span class="absolute -top-2 -right-2 bg-secondary text-black text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
-                </a>
-                <a href="user_account_dashboard.html" class="text-secondary font-semibold">My Account</a>
-            </div>
-
-            <!-- Mobile Menu Button -->
-            <button class="md:hidden text-text-primary">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            <!-- Navigation Menu -->
+            <nav class="space-y-2">
+              <a
+                href="#overview"
+                class="nav-item active flex items-center space-x-3 p-3 rounded-lg bg-secondary/10 text-secondary"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  ></path>
                 </svg>
+                <span>Overview</span>
+              </a>
+              <a
+                href="#orders"
+                class="nav-item flex items-center space-x-3 p-3 rounded-lg text-text-secondary hover:bg-surface hover:text-secondary transition-all duration-300"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 11V7a4 4 0 00-8 0v4M8 11v6h8v-6M8 11H6a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2h-2"
+                  ></path>
+                </svg>
+                <span>Order History</span>
+              </a>
+              <a
+                href="#addresses"
+                class="nav-item flex items-center space-x-3 p-3 rounded-lg text-text-secondary hover:bg-surface hover:text-secondary transition-all duration-300"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  ></path>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  ></path>
+                </svg>
+                <span>Addresses</span>
+              </a>
+              <a
+                href="#payments"
+                class="nav-item flex items-center space-x-3 p-3 rounded-lg text-text-secondary hover:bg-surface hover:text-secondary transition-all duration-300"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                  ></path>
+                </svg>
+                <span>Payment Methods</span>
+              </a>
+              <a
+                href="#preferences"
+                class="nav-item flex items-center space-x-3 p-3 rounded-lg text-text-secondary hover:bg-surface hover:text-secondary transition-all duration-300"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  ></path>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  ></path>
+                </svg>
+                <span>Preferences</span>
+              </a>
+              <a
+                href="#loyalty"
+                class="nav-item flex items-center space-x-3 p-3 rounded-lg text-text-secondary hover:bg-surface hover:text-secondary transition-all duration-300"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                  ></path>
+                </svg>
+                <span>Loyalty Program</span>
+              </a>
+              <a
+                href="#security"
+                class="nav-item flex items-center space-x-3 p-3 rounded-lg text-text-secondary hover:bg-surface hover:text-secondary transition-all duration-300"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  ></path>
+                </svg>
+                <span>Security</span>
+              </a>
+            </nav>
+
+            <!-- Quick Actions -->
+            <div class="mt-6 pt-6 border-t border-surface">
+              <a
+                href="homepage.html"
+                class="btn-secondary w-full text-center block mb-3"
+                >Continue Shopping</a
+              >
+              <button
+                id="signOutBtn"
+                class="text-text-secondary hover:text-secondary text-sm transition-colors duration-300 block w-full text-center"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- ========== MAIN RIGHT CONTENT ========== -->
+        <div class="lg:w-3/4 space-y-12">
+          <!-- ===== OVERVIEW ===== -->
+          <section id="overview" class="content-section">
+            <div class="mb-8">
+              <h1
+                id="overviewWelcome"
+                class="text-3xl font-bold mb-2"
+              >
+                Welcome back!
+              </h1>
+              <p class="text-text-secondary">
+                Manage your account, track orders, and discover new favorites.
+              </p>
+            </div>
+
+            <!-- Quick Stats -->
+            <div
+              class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
+            >
+              <div class="card text-center">
+                <div
+                  class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3"
+                >
+                  <svg
+                    class="w-6 h-6 text-black"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M16 11V7a4 4 0 00-8 0v4M8 11v6h8v-6M8 11H6a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2h-2"
+                    ></path>
+                  </svg>
+                </div>
+                <div
+                  id="statTotalOrders"
+                  class="text-2xl font-bold text-secondary mb-1"
+                >
+                  0
+                </div>
+                <p class="text-text-secondary text-sm">
+                  Total Orders
+                </p>
+              </div>
+
+              <div class="card text-center">
+                <div
+                  class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3"
+                >
+                  <svg
+                    class="w-6 h-6 text-black"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                    ></path>
+                  </svg>
+                </div>
+                <div
+                  id="statTotalSpent"
+                  class="text-2xl font-bold text-secondary mb-1"
+                >
+                  ₹0
+                </div>
+                <p class="text-text-secondary text-sm">
+                  Total Spent
+                </p>
+              </div>
+
+              <div class="card text-center">
+                <div
+                  class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3"
+                >
+                  <svg
+                    class="w-6 h-6 text-black"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                    ></path>
+                  </svg>
+                </div>
+                <div
+                  id="statLoyaltyPoints"
+                  class="text-2xl font-bold text-secondary mb-1"
+                >
+                  0
+                </div>
+                <p class="text-text-secondary text-sm">
+                  Loyalty Points
+                </p>
+              </div>
+
+              <div class="card text-center">
+                <div
+                  class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3"
+                >
+                  <svg
+                    class="w-6 h-6 text-black"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    ></path>
+                  </svg>
+                </div>
+                <div
+                  id="statWishlistCount"
+                  class="text-2xl font-bold text-secondary mb-1"
+                >
+                  0
+                </div>
+                <p class="text-text-secondary text-sm">
+                  Wishlist Items
+                </p>
+              </div>
+            </div>
+
+            <!-- Recent Orders (from DB) -->
+            <div class="card mb-8">
+              <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold">Recent Orders</h2>
+                <a
+                  href="#orders"
+                  class="text-secondary hover:text-accent transition-colors duration-300"
+                  >View All</a
+                >
+              </div>
+              <div
+                id="recentOrdersList"
+                class="space-y-4 text-sm text-text-secondary"
+              >
+                <p>Loading orders…</p>
+              </div>
+            </div>
+
+            <!-- Simple recommendations (still static UI – you can wire later) -->
+            <div class="card">
+              <h2 class="text-xl font-semibold mb-6">
+                Recommended for You
+              </h2>
+              <div
+                class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm"
+              >
+                <div
+                  class="bg-background rounded-lg p-4 hover:bg-surface transition-colors duration-300"
+                >
+                  <div
+                    class="w-full h-32 rounded-lg overflow-hidden mb-4 bg-surface"
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1612136435623-a9bb63231e07"
+                      alt="Bread"
+                      class="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <h3 class="font-semibold mb-2">
+                    Artisanal Sourdough Bread
+                  </h3>
+                  <p class="text-text-secondary text-xs mb-3">
+                    Based on your bakery purchases
+                  </p>
+                  <div
+                    class="flex items-center justify-between text-sm"
+                  >
+                    <span class="text-lg font-semibold text-secondary"
+                      >₹199</span
+                    >
+                    <button class="btn-primary text-xs px-4 py-2">
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  class="bg-background rounded-lg p-4 hover:bg-surface transition-colors duration-300"
+                >
+                  <div
+                    class="w-full h-32 rounded-lg overflow-hidden mb-4 bg-surface"
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1595315930261-1cdf78383476"
+                      alt="Spinach"
+                      class="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <h3 class="font-semibold mb-2">
+                    Organic Baby Spinach
+                  </h3>
+                  <p class="text-text-secondary text-xs mb-3">
+                    Perfect for your healthy lifestyle
+                  </p>
+                  <div
+                    class="flex items-center justify-between text-sm"
+                  >
+                    <span class="text-lg font-semibold text-secondary"
+                      >₹89</span
+                    >
+                    <button class="btn-primary text-xs px-4 py-2">
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  class="bg-background rounded-lg p-4 hover:bg-surface transition-colors duration-300"
+                >
+                  <div
+                    class="w-full h-32 rounded-lg overflow-hidden mb-4 bg-surface"
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1578489665459-bba1a03f2c19"
+                      alt="Berries"
+                      class="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <h3 class="font-semibold mb-2">
+                    Organic Blueberries
+                  </h3>
+                  <p class="text-text-secondary text-xs mb-3">
+                    Frequently bought with your items
+                  </p>
+                  <div
+                    class="flex items-center justify-between text-sm"
+                  >
+                    <span class="text-lg font-semibold text-secondary"
+                      >₹149</span
+                    >
+                    <button class="btn-primary text-xs px-4 py-2">
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ===== ORDER HISTORY ===== -->
+          <section id="orders" class="content-section hidden">
+            <div class="mb-8">
+              <h1 class="text-3xl font-bold mb-2">Order History</h1>
+              <p class="text-text-secondary">
+                Track your past orders and reorder your favorites.
+              </p>
+            </div>
+
+            <!-- Simple filters (UI only for now) -->
+            <div class="card mb-6">
+              <div
+                class="flex flex-wrap items-center gap-4 text-sm"
+              >
+                <select class="input-field">
+                  <option>All Orders</option>
+                  <option>Delivered</option>
+                  <option>In Transit</option>
+                  <option>Pending</option>
+                  <option>Cancelled</option>
+                </select>
+                <select class="input-field">
+                  <option>Last 30 Days</option>
+                  <option>Last 3 Months</option>
+                  <option>Last 6 Months</option>
+                  <option>All Time</option>
+                </select>
+                <button class="btn-secondary flex items-center">
+                  <svg
+                    class="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                    ></path>
+                  </svg>
+                  Filter
+                </button>
+              </div>
+            </div>
+
+            <div
+              id="orderHistoryList"
+              class="space-y-4 text-sm text-text-secondary"
+            >
+              <p>Loading order history…</p>
+            </div>
+          </section>
+
+          <!-- ===== ADDRESSES ===== -->
+          <section id="addresses" class="content-section hidden">
+            <div class="mb-8">
+              <h1 class="text-3xl font-bold mb-2">
+                Delivery Addresses
+              </h1>
+              <p class="text-text-secondary">
+                Manage your saved addresses for quick checkout.
+              </p>
+            </div>
+
+            <div
+              id="addressesList"
+              class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm"
+            >
+              <p class="text-text-secondary">
+                Loading addresses…
+              </p>
+            </div>
+          </section>
+
+          <!-- ===== PAYMENT METHODS ===== -->
+          <section id="payments" class="content-section hidden">
+            <div class="mb-8">
+              <h1 class="text-3xl font-bold mb-2">
+                Payment Methods
+              </h1>
+              <p class="text-text-secondary">
+                Manage your saved payment methods for secure
+                checkout.
+              </p>
+            </div>
+
+            <div id="paymentMethodsList" class="space-y-4 text-sm text-text-secondary relative">
+
+
+
+              <p>Loading payment methods…</p>
+            </div>
+          </section>
+
+          <!-- ===== PREFERENCES ===== -->
+          <section id="preferences" class="content-section hidden">
+            <div class="mb-8">
+              <h1 class="text-3xl font-bold mb-2">Preferences</h1>
+              <p class="text-text-secondary">
+                Customize your shopping experience and dietary
+                preferences.
+              </p>
+            </div>
+
+            <div class="space-y-6 text-sm">
+              <!-- Dietary -->
+              <div class="card">
+                <h2 class="text-xl font-semibold mb-4">
+                  Dietary Preferences
+                </h2>
+                <div
+                  class="grid grid-cols-2 md:grid-cols-3 gap-4"
+                >
+                  <label
+                    class="flex items-center space-x-3 cursor-pointer"
+                  >
+                    <input
+                      id="pref_organic"
+                      type="checkbox"
+                      class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary"
+                    />
+                    <span>Organic</span>
+                  </label>
+                  <label
+                    class="flex items-center space-x-3 cursor-pointer"
+                  >
+                    <input
+                      id="pref_vegetarian"
+                      type="checkbox"
+                      class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary"
+                    />
+                    <span>Vegetarian</span>
+                  </label>
+                  <label
+                    class="flex items-center space-x-3 cursor-pointer"
+                  >
+                    <input
+                      id="pref_vegan"
+                      type="checkbox"
+                      class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary"
+                    />
+                    <span>Vegan</span>
+                  </label>
+                  <label
+                    class="flex items-center space-x-3 cursor-pointer"
+                  >
+                    <input
+                      id="pref_gluten_free"
+                      type="checkbox"
+                      class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary"
+                    />
+                    <span>Gluten-Free</span>
+                  </label>
+                  <label
+                    class="flex items-center space-x-3 cursor-pointer"
+                  >
+                    <input
+                      id="pref_keto"
+                      type="checkbox"
+                      class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary"
+                    />
+                    <span>Keto</span>
+                  </label>
+                  <label
+                    class="flex items-center space-x-3 cursor-pointer"
+                  >
+                    <input
+                      id="pref_paleo"
+                      type="checkbox"
+                      class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary"
+                    />
+                    <span>Paleo</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Notifications -->
+              <div class="card">
+                <h2 class="text-xl font-semibold mb-4">
+                  Notifications
+                </h2>
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="font-medium">Order Updates</p>
+                      <p class="text-text-secondary text-xs">
+                        Get notified about order status changes
+                      </p>
+                    </div>
+                    <label
+                      class="relative inline-flex items-center cursor-pointer"
+                    >
+                      <input
+                        id="pref_notify_orders"
+                        type="checkbox"
+                        class="sr-only peer"
+                      />
+                      <div
+                        class="w-11 h-6 bg-surface rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-secondary after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"
+                      ></div>
+                    </label>
+                  </div>
+
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="font-medium">
+                        Promotional Emails
+                      </p>
+                      <p class="text-text-secondary text-xs">
+                        Receive deals and special offers
+                      </p>
+                    </div>
+                    <label
+                      class="relative inline-flex items-center cursor-pointer"
+                    >
+                      <input
+                        id="pref_notify_promotions"
+                        type="checkbox"
+                        class="sr-only peer"
+                      />
+                      <div
+                        class="w-11 h-6 bg-surface rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-secondary after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"
+                      ></div>
+                    </label>
+                  </div>
+
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="font-medium">
+                        SMS Notifications
+                      </p>
+                      <p class="text-text-secondary text-xs">
+                        Text messages for delivery updates
+                      </p>
+                    </div>
+                    <label
+                      class="relative inline-flex items-center cursor-pointer"
+                    >
+                      <input
+                        id="pref_notify_sms"
+                        type="checkbox"
+                        class="sr-only peer"
+                      />
+                      <div
+                        class="w-11 h-6 bg-surface rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-secondary after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"
+                      ></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Delivery prefs -->
+              <div class="card">
+                <h2 class="text-xl font-semibold mb-4">
+                  Delivery Preferences
+                </h2>
+                <div class="space-y-4">
+                  <div>
+                    <label
+                      class="block text-sm font-medium mb-2"
+                      >Preferred Delivery Time</label
+                    >
+                    <select
+                      id="pref_delivery_time"
+                      class="input-field w-full text-sm"
+                    >
+                      <option>Morning (8AM - 12PM)</option>
+                      <option>Afternoon (12PM - 5PM)</option>
+                      <option>Evening (5PM - 8PM)</option>
+                      <option>No Preference</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      class="block text-sm font-medium mb-2"
+                      >Special Instructions</label
+                    >
+                    <textarea
+                      id="pref_special_instructions"
+                      class="input-field w-full h-24 resize-none text-sm"
+                      placeholder="Leave at door, ring doorbell, etc."
+                    ></textarea>
+                  </div>
+                  <button
+                    id="savePreferencesBtn"
+                    class="btn-primary text-sm px-4 py-2"
+                  >
+                    Save Preferences
+                  </button>
+                  <p
+                    id="prefsSavedMessage"
+                    class="text-xs text-secondary mt-1 hidden"
+                  >
+                    Preferences updated!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ===== LOYALTY ===== -->
+          <section id="loyalty" class="content-section hidden">
+            <div class="mb-8">
+              <h1 class="text-3xl font-bold mb-2">
+                Loyalty Program
+              </h1>
+              <p class="text-text-secondary">
+                Track your rewards and unlock exclusive benefits.
+              </p>
+            </div>
+
+            <div class="card mb-6 text-sm">
+              <div class="text-center mb-6">
+                <div
+                  class="w-24 h-24 bg-gradient-to-r from-secondary to-accent rounded-full flex items-center justify-center mx-auto mb-4"
+                >
+                  <svg
+                    class="w-12 h-12 text-black"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                    ></path>
+                  </svg>
+                </div>
+                <h2
+                  id="loyaltyTierLabel"
+                  class="text-2xl font-bold text-secondary mb-2"
+                >
+                  Member
+                </h2>
+                <p
+                  id="loyaltyTierDescription"
+                  class="text-text-secondary text-sm"
+                >
+                  Earn points on every purchase.
+                </p>
+              </div>
+
+              <div class="mb-6">
+                <div
+                  class="flex items-center justify-between mb-2 text-xs"
+                >
+                  <span class="font-medium">Current Points</span>
+                  <span
+                    id="loyaltyProgressLabel"
+                    class="font-medium"
+                  >
+                    0 / 5000
+                  </span>
+                </div>
+                <div class="w-full bg-surface rounded-full h-3">
+                  <div
+                    id="loyaltyProgressBar"
+                    class="bg-gradient-to-r from-secondary to-accent h-3 rounded-full"
+                    style="width: 0%"
+                  ></div>
+                </div>
+                <p
+                  id="loyaltyNextLabel"
+                  class="text-text-secondary text-xs mt-2"
+                >
+                  5000 points until next level
+                </p>
+              </div>
+            </div>
+
+            <div class="card text-sm">
+              <h2 class="text-xl font-semibold mb-4">
+                Recent Activity
+              </h2>
+              <div
+                id="loyaltyActivityList"
+                class="space-y-3 text-text-secondary"
+              >
+                <p>No loyalty activity yet.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- ===== SECURITY ===== -->
+          <section id="security" class="content-section hidden">
+            <div class="mb-8">
+              <h1 class="text-3xl font-bold mb-2">
+                Account Security
+              </h1>
+              <p class="text-text-secondary">
+                Manage your account security and privacy preferences.
+              </p>
+            </div>
+
+            <div class="space-y-6 text-sm">
+              <!-- Account Info (readonly basic, you can extend later) -->
+              <div class="card">
+                <h2 class="text-xl font-semibold mb-4">
+                  Account Information
+                </h2>
+                <div class="space-y-4">
+                  <div
+                    class="grid grid-cols-1 md:grid-cols-2 gap-4"
+                  >
+                    <div>
+                      <label
+                        class="block text-xs font-medium mb-1"
+                        >Full Name</label
+                      >
+                      <input
+                        id="sec_full_name"
+                        type="text"
+                        class="input-field w-full"
+                        disabled
+                      />
+                    </div>
+                    <div>
+                      <label
+                        class="block text-xs font-medium mb-1"
+                        >Username</label
+                      >
+                      <input
+                        id="sec_username"
+                        type="text"
+                        class="input-field w-full"
+                        disabled
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      class="block text-xs font-medium mb-1"
+                      >Email Address</label
+                    >
+                    <input
+                      id="sec_email"
+                      type="email"
+                      class="input-field w-full"
+                      disabled
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Login Activity -->
+              <div class="card">
+                <h2 class="text-xl font-semibold mb-4">
+                  Recent Login Activity
+                </h2>
+                <div
+                  id="loginActivityList"
+                  class="space-y-3 text-text-secondary"
+                >
+                  <p>Loading recent activity…</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========= ADDRESS MODAL ========= -->
+  <div
+     id="addressModalBackdrop"
+  class="fixed inset-0 bg-black/60 z-50 hidden overflow-y-auto flex items-start justify-center py-20"
+
+  >
+    <div
+      class="card max-w-lg w-full mx-4 p-6 bg-background border border-surface rounded-2xl"
+    >
+      <div class="flex items-center justify-between mb-4">
+        <h2 id="addressModalTitle" class="text-lg font-semibold">
+          Add New Address
+        </h2>
+        <button
+          type="button"
+          class="text-text-secondary hover:text-secondary"
+          onclick="closeAddressModal()"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+      </div>
+
+      <form
+        id="addressForm"
+        onsubmit="submitAddressForm(event)"
+        class="space-y-4 text-sm"
+      >
+        <input type="hidden" id="addressFormId" />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs mb-1">Full Name</label>
+            <input
+              id="addressFullName"
+              type="text"
+              class="input-field w-full"
+              placeholder="Full name"
+            />
+          </div>
+          <div>
+            <label class="block text-xs mb-1">Phone</label>
+            <input
+              id="addressPhone"
+              type="text"
+              class="input-field w-full"
+              placeholder="10-digit phone"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs mb-1">Address Line 1</label>
+          <input
+            id="addressLine1"
+            type="text"
+            class="input-field w-full"
+            placeholder="House number, street"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs mb-1">Address Line 2 (optional)</label>
+          <input
+            id="addressLine2"
+            type="text"
+            class="input-field w-full"
+            placeholder="Landmark, area"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs mb-1">City</label>
+            <input
+              id="addressCity"
+              type="text"
+              class="input-field w-full"
+              required
+            />
+          </div>
+          <div>
+            <label class="block text-xs mb-1">State</label>
+            <input
+              id="addressState"
+              type="text"
+              class="input-field w-full"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs mb-1">Postal Code</label>
+            <input
+              id="addressPostalCode"
+              type="text"
+              class="input-field w-full"
+              required
+            />
+          </div>
+          <div>
+            <label class="block text-xs mb-1">Country</label>
+            <input
+              id="addressCountry"
+              type="text"
+              class="input-field w-full"
+              value="India"
+            />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <label class="flex items-center space-x-2 text-xs">
+            <input
+              id="addressIsDefault"
+              type="checkbox"
+              class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary"
+            />
+            <span>Set as default address</span>
+          </label>
+
+          <div class="space-x-2">
+            <button
+              type="button"
+              class="btn-secondary text-xs px-3 py-2"
+              onclick="closeAddressModal()"
+            >
+              Cancel
             </button>
-        </nav>
-    </header>
-
-    <!-- Main Content -->
-    <main class="pt-20 min-h-screen">
-        <div class="container mx-auto px-4 py-8">
-            <div class="flex flex-col lg:flex-row gap-8">
-                <!-- Sidebar Navigation -->
-                <aside class="lg:w-1/4">
-                    <div class="card sticky top-24">
-                        <!-- User Profile Header -->
-                        <div class="text-center mb-6 pb-6 border-b border-surface">
-                            <div class="w-20 h-20 rounded-full overflow-hidden mx-auto mb-4">
-                                <img src="https://img.rocket.new/generatedImages/rocket_gen_img_1902b0ce4-1762273505171.png" 
-                                     alt="Profile picture of John Doe, a DealDrop customer with a friendly smile" 
-                                     class="w-full h-full object-cover"
-                                     loading="lazy"
-                                     onerror="this.src='https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150'; this.onerror=null;">
-                            </div>
-                            <h2 class="text-xl font-semibold mb-1">SAHIL</h2>
-                            <p class="text-text-secondary text-sm">Premium Member</p>
-                            <div class="flex items-center justify-center mt-2">
-                                <div class="w-2 h-2 bg-secondary rounded-full mr-2"></div>
-                                <span class="text-secondary text-sm font-medium">Gold Status</span>
-                            </div>
-                        </div>
-
-                        <!-- Navigation Menu -->
-                        <nav class="space-y-2">
-                            <a href="#overview" class="nav-item active flex items-center space-x-3 p-3 rounded-lg bg-secondary/10 text-secondary">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                </svg>
-                                <span>Overview</span>
-                            </a>
-                            <a href="#orders" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-text-secondary hover:bg-surface hover:text-secondary transition-all duration-300">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M8 11v6h8v-6M8 11H6a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2h-2"></path>
-                                </svg>
-                                <span>Order History</span>
-                            </a>
-                            <a href="#addresses" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-text-secondary hover:bg-surface hover:text-secondary transition-all duration-300">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                                <span>Addresses</span>
-                            </a>
-                            <a href="#payments" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-text-secondary hover:bg-surface hover:text-secondary transition-all duration-300">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                                </svg>
-                                <span>Payment Methods</span>
-                            </a>
-                            <a href="#preferences" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-text-secondary hover:bg-surface hover:text-secondary transition-all duration-300">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                                <span>Preferences</span>
-                            </a>
-                            <a href="#loyalty" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-text-secondary hover:bg-surface hover:text-secondary transition-all duration-300">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                                </svg>
-                                <span>Loyalty Program</span>
-                            </a>
-                            <a href="#security" class="nav-item flex items-center space-x-3 p-3 rounded-lg text-text-secondary hover:bg-surface hover:text-secondary transition-all duration-300">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                                </svg>
-                                <span>Security</span>
-                            </a>
-                        </nav>
-
-                        <!-- Quick Actions -->
-                        <div class="mt-6 pt-6 border-t border-surface">
-                            <a href="homepage.html" class="btn-secondary w-full text-center block mb-3">Continue Shopping</a>
-                            <a href="landing_page.html" class="text-text-secondary hover:text-secondary text-sm transition-colors duration-300 block text-center">Sign Out</a>
-                        </div>
-                    </div>
-                </aside>
-
-                <!-- Main Content Area -->
-                <div class="lg:w-3/4">
-                    <!-- Overview Section -->
-                    <section id="overview" class="content-section">
-                        <div class="mb-8">
-                            <h1 class="text-3xl font-bold mb-2">Welcome back, Sahil!</h1>
-                            <p class="text-text-secondary">Manage your account, track orders, and discover new favorites.</p>
-                        </div>
-
-                        <!-- Quick Stats -->
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                            <div class="card text-center">
-                                <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M8 11v6h8v-6M8 11H6a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2h-2"></path>
-                                    </svg>
-                                </div>
-                                <div class="text-2xl font-bold text-secondary mb-1">24</div>
-                                <p class="text-text-secondary text-sm">Total Orders</p>
-                            </div>
-                            <div class="card text-center">
-                                <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                                    </svg>
-                                </div>
-                                <div class="text-2xl font-bold text-secondary mb-1">$1,247</div>
-                                <p class="text-text-secondary text-sm">Total Spent</p>
-                            </div>
-                            <div class="card text-center">
-                                <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                                    </svg>
-                                </div>
-                                <div class="text-2xl font-bold text-secondary mb-1">2,450</div>
-                                <p class="text-text-secondary text-sm">Loyalty Points</p>
-                            </div>
-                            <div class="card text-center">
-                                <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                                    </svg>
-                                </div>
-                                <div class="text-2xl font-bold text-secondary mb-1">18</div>
-                                <p class="text-text-secondary text-sm">Wishlist Items</p>
-                            </div>
-                        </div>
-
-                        <!-- Recent Orders -->
-                        <div class="card mb-8">
-                            <div class="flex items-center justify-between mb-6">
-                                <h2 class="text-xl font-semibold">Recent Orders</h2>
-                                <a href="#orders" class="text-secondary hover:text-accent transition-colors duration-300">View All</a>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between p-4 bg-background rounded-lg">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="w-12 h-12 rounded-lg overflow-hidden">
-                                            <img src="https://images.unsplash.com/photo-1645887391938-bcccce2f3762" 
-                                                 alt="Fresh organic vegetables including tomatoes and lettuce from recent order" 
-                                                 class="w-full h-full object-cover"
-                                                 loading="lazy"
-                                                 onerror="this.src='https://images.unsplash.com/photo-1590779033100-9f60a05a013d?q=80&w=100&auto=format&fit=crop'; this.onerror=null;">
-                                        </div>
-                                        <div>
-                                            <h3 class="font-semibold">Order #DD-2024-1156</h3>
-                                            <p class="text-text-secondary text-sm">November 10, 2025 • 5 items</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-lg font-semibold">$89.50</div>
-                                        <div class="flex items-center space-x-2">
-                                            <div class="w-2 h-2 bg-secondary rounded-full"></div>
-                                            <span class="text-secondary text-sm">Delivered</span>
-                                        </div>
-                                    </div>
-                                    <button class="btn-secondary ml-4">Reorder</button>
-                                </div>
-                                <div class="flex items-center justify-between p-4 bg-background rounded-lg">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="w-12 h-12 rounded-lg overflow-hidden">
-                                            <img src="https://images.unsplash.com/photo-1547036511-caf5491e415a" 
-                                                 alt="Premium organic meat cuts from recent grocery order" 
-                                                 class="w-full h-full object-cover"
-                                                 loading="lazy"
-                                                 onerror="this.src='https://images.pexels.com/photos/65175/pexels-photo-65175.jpeg?auto=compress&cs=tinysrgb&w=100'; this.onerror=null;">
-                                        </div>
-                                        <div>
-                                            <h3 class="font-semibold">Order #DD-2024-1155</h3>
-                                            <p class="text-text-secondary text-sm">November 8, 2025 • 3 items</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-lg font-semibold">$124.75</div>
-                                        <div class="flex items-center space-x-2">
-                                            <div class="w-2 h-2 bg-warning rounded-full"></div>
-                                            <span class="text-warning text-sm">In Transit</span>
-                                        </div>
-                                    </div>
-                                    <button class="btn-secondary ml-4">Track Order</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Personalized Recommendations -->
-                        <div class="card">
-                            <h2 class="text-xl font-semibold mb-6">Recommended for You</h2>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div class="bg-background rounded-lg p-4 hover:bg-surface transition-colors duration-300">
-                                    <div class="w-full h-32 rounded-lg overflow-hidden mb-4">
-                                        <img src="https://images.unsplash.com/photo-1612136435623-a9bb63231e07" 
-                                             alt="Artisanal sourdough bread with rustic crust, recommended based on purchase history" 
-                                             class="w-full h-full object-cover"
-                                             loading="lazy"
-                                             onerror="this.src='https://images.pixabay.com/photo/2017/06/06/22/46/mediterranean-cuisine-2378758_1280.jpg'; this.onerror=null;">
-                                    </div>
-                                    <h3 class="font-semibold mb-2">Artisanal Sourdough Bread</h3>
-                                    <p class="text-text-secondary text-sm mb-3">Based on your recent bakery purchases</p>
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-lg font-semibold text-secondary">$8.99</span>
-                                        <button class="btn-primary text-sm px-4 py-2">Add to Cart</button>
-                                    </div>
-                                </div>
-                                <div class="bg-background rounded-lg p-4 hover:bg-surface transition-colors duration-300">
-                                    <div class="w-full h-32 rounded-lg overflow-hidden mb-4">
-                                        <img src="https://images.unsplash.com/photo-1595315930261-1cdf78383476" 
-                                             alt="Fresh organic spinach leaves in a wicker basket, perfect for healthy meals" 
-                                             class="w-full h-full object-cover"
-                                             loading="lazy"
-                                             onerror="this.src='https://images.unsplash.com/photo-1590779033100-9f60a05a013d?q=80&w=400&auto=format&fit=crop'; this.onerror=null;">
-                                    </div>
-                                    <h3 class="font-semibold mb-2">Organic Baby Spinach</h3>
-                                    <p class="text-text-secondary text-sm mb-3">Perfect for your healthy lifestyle</p>
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-lg font-semibold text-secondary">$4.49</span>
-                                        <button class="btn-primary text-sm px-4 py-2">Add to Cart</button>
-                                    </div>
-                                </div>
-                                <div class="bg-background rounded-lg p-4 hover:bg-surface transition-colors duration-300">
-                                    <div class="w-full h-32 rounded-lg overflow-hidden mb-4">
-                                        <img src="https://images.unsplash.com/photo-1578489665459-bba1a03f2c19" 
-                                             alt="Fresh organic blueberries in a wooden bowl, rich in antioxidants and flavor" 
-                                             class="w-full h-full object-cover"
-                                             loading="lazy"
-                                             onerror="this.src='https://images.pixabay.com/photo/2016/04/15/08/04/strawberries-1330459_1280.jpg'; this.onerror=null;">
-                                    </div>
-                                    <h3 class="font-semibold mb-2">Organic Blueberries</h3>
-                                    <p class="text-text-secondary text-sm mb-3">Frequently bought with your items</p>
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-lg font-semibold text-secondary">$6.99</span>
-                                        <button class="btn-primary text-sm px-4 py-2">Add to Cart</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Order History Section -->
-                    <section id="orders" class="content-section hidden">
-                        <div class="mb-8">
-                            <h1 class="text-3xl font-bold mb-2">Order History</h1>
-                            <p class="text-text-secondary">Track your past orders and reorder your favorites.</p>
-                        </div>
-
-                        <!-- Order Filters -->
-                        <div class="card mb-6">
-                            <div class="flex flex-wrap items-center gap-4">
-                                <select class="input-field">
-                                    <option>All Orders</option>
-                                    <option>Delivered</option>
-                                    <option>In Transit</option>
-                                    <option>Processing</option>
-                                </select>
-                                <select class="input-field">
-                                    <option>Last 30 Days</option>
-                                    <option>Last 3 Months</option>
-                                    <option>Last 6 Months</option>
-                                    <option>All Time</option>
-                                </select>
-                                <button class="btn-secondary">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
-                                    </svg>
-                                    Filter
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Orders List -->
-                        <div class="space-y-6">
-                            <div class="card">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div>
-                                        <h3 class="text-lg font-semibold">Order #DD-2024-1156</h3>
-                                        <p class="text-text-secondary">Placed on November 10, 2025</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-xl font-semibold text-secondary">$89.50</div>
-                                        <div class="flex items-center space-x-2 mt-1">
-                                            <div class="w-2 h-2 bg-secondary rounded-full"></div>
-                                            <span class="text-secondary text-sm">Delivered</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-12 h-12 rounded-lg overflow-hidden">
-                                            <img src="https://images.unsplash.com/photo-1591181550008-1091eb06b461" 
-                                                 alt="Organic tomatoes from order DD-2024-1156" 
-                                                 class="w-full h-full object-cover"
-                                                 loading="lazy"
-                                                 onerror="this.src='https://images.unsplash.com/photo-1590779033100-9f60a05a013d?q=80&w=100&auto=format&fit=crop'; this.onerror=null;">
-                                        </div>
-                                        <div>
-                                            <p class="font-medium">Organic Tomatoes</p>
-                                            <p class="text-text-secondary text-sm">2 lbs • $8.99</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-12 h-12 rounded-lg overflow-hidden">
-                                            <img src="https://images.unsplash.com/photo-1621930600086-aa547aad836a" 
-                                                 alt="Artisanal bread from order DD-2024-1156" 
-                                                 class="w-full h-full object-cover"
-                                                 loading="lazy"
-                                                 onerror="this.src='https://images.pixabay.com/photo/2017/06/06/22/46/mediterranean-cuisine-2378758_1280.jpg'; this.onerror=null;">
-                                        </div>
-                                        <div>
-                                            <p class="font-medium">Sourdough Bread</p>
-                                            <p class="text-text-secondary text-sm">1 loaf • $8.99</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-12 h-12 rounded-lg overflow-hidden">
-                                            <img src="https://images.unsplash.com/photo-1655002999509-4c4890ada4d6" 
-                                                 alt="Organic blueberries from order DD-2024-1156" 
-                                                 class="w-full h-full object-cover"
-                                                 loading="lazy"
-                                                 onerror="this.src='https://images.pixabay.com/photo/2016/04/15/08/04/strawberries-1330459_1280.jpg'; this.onerror=null;">
-                                        </div>
-                                        <div>
-                                            <p class="font-medium">Organic Blueberries</p>
-                                            <p class="text-text-secondary text-sm">1 pint • $6.99</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between pt-4 border-t border-surface">
-                                    <div class="flex space-x-3">
-                                        <button class="btn-primary">Reorder</button>
-                                        <button class="btn-secondary">View Details</button>
-                                    </div>
-                                    <a href="javascript:void(0)" class="text-secondary hover:text-accent transition-colors duration-300">Download Receipt</a>
-                                </div>
-                            </div>
-
-                            <div class="card">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div>
-                                        <h3 class="text-lg font-semibold">Order #DD-2024-1155</h3>
-                                        <p class="text-text-secondary">Placed on November 8, 2025</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-xl font-semibold text-secondary">$124.75</div>
-                                        <div class="flex items-center space-x-2 mt-1">
-                                            <div class="w-2 h-2 bg-warning rounded-full"></div>
-                                            <span class="text-warning text-sm">In Transit</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-12 h-12 rounded-lg overflow-hidden">
-                                            <img src="https://images.unsplash.com/photo-1700481158997-60ff09259f24" 
-                                                 alt="Premium grass-fed beef from order DD-2024-1155" 
-                                                 class="w-full h-full object-cover"
-                                                 loading="lazy"
-                                                 onerror="this.src='https://images.pexels.com/photos/65175/pexels-photo-65175.jpeg?auto=compress&cs=tinysrgb&w=100'; this.onerror=null;">
-                                        </div>
-                                        <div>
-                                            <p class="font-medium">Grass-Fed Beef Steaks</p>
-                                            <p class="text-text-secondary text-sm">2 lbs • $45.99</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-12 h-12 rounded-lg overflow-hidden">
-                                            <img src="https://images.unsplash.com/photo-1673635352332-e531c14a77f5" 
-                                                 alt="Organic mixed greens from order DD-2024-1155" 
-                                                 class="w-full h-full object-cover"
-                                                 loading="lazy"
-                                                 onerror="this.src='https://images.unsplash.com/photo-1590779033100-9f60a05a013d?q=80&w=100&auto=format&fit=crop'; this.onerror=null;">
-                                        </div>
-                                        <div>
-                                            <p class="font-medium">Organic Mixed Greens</p>
-                                            <p class="text-text-secondary text-sm">5 oz • $7.49</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between pt-4 border-t border-surface">
-                                    <div class="flex space-x-3">
-                                        <button class="btn-secondary">Track Order</button>
-                                        <button class="btn-secondary">View Details</button>
-                                    </div>
-                                    <p class="text-text-secondary text-sm">Expected delivery: Nov 13, 2025</p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Addresses Section -->
-                    <section id="addresses" class="content-section hidden">
-                        <div class="mb-8">
-                            <h1 class="text-3xl font-bold mb-2">Delivery Addresses</h1>
-                            <p class="text-text-secondary">Manage your saved addresses for quick checkout.</p>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Default Address -->
-                            <div class="card relative">
-                                <div class="absolute top-4 right-4">
-                                    <span class="bg-secondary text-black text-xs px-2 py-1 rounded-full font-medium">Default</span>
-                                </div>
-                                <div class="mb-4">
-                                    <h3 class="text-lg font-semibold mb-2">Home</h3>
-                                    <div class="text-text-secondary space-y-1">
-                                        <p>John Doe</p>
-                                        <p>123 Oak Street, Apt 4B</p>
-                                        <p>San Francisco, CA 94102</p>
-                                        <p>United States</p>
-                                        <p class="mt-2">Phone: (555) 123-4567</p>
-                                    </div>
-                                </div>
-                                <div class="flex space-x-3">
-                                    <button class="btn-secondary flex-1">Edit</button>
-                                    <button class="btn-secondary">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Work Address -->
-                            <div class="card">
-                                <div class="mb-4">
-                                    <h3 class="text-lg font-semibold mb-2">Work</h3>
-                                    <div class="text-text-secondary space-y-1">
-                                        <p>John Doe</p>
-                                        <p>456 Business Plaza, Suite 200</p>
-                                        <p>San Francisco, CA 94105</p>
-                                        <p>United States</p>
-                                        <p class="mt-2">Phone: (555) 987-6543</p>
-                                    </div>
-                                </div>
-                                <div class="flex space-x-3">
-                                    <button class="btn-secondary flex-1">Edit</button>
-                                    <button class="btn-secondary">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Add New Address -->
-                            <div class="card border-2 border-dashed border-surface hover:border-secondary transition-colors duration-300 cursor-pointer">
-                                <div class="text-center py-8">
-                                    <div class="w-12 h-12 bg-surface rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                        </svg>
-                                    </div>
-                                    <h3 class="text-lg font-semibold mb-2">Add New Address</h3>
-                                    <p class="text-text-secondary">Add a new delivery location</p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Payment Methods Section -->
-                    <section id="payments" class="content-section hidden">
-                        <div class="mb-8">
-                            <h1 class="text-3xl font-bold mb-2">Payment Methods</h1>
-                            <p class="text-text-secondary">Manage your saved payment methods for secure checkout.</p>
-                        </div>
-
-                        <div class="space-y-6">
-                            <!-- Credit Card -->
-                            <div class="card">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="w-12 h-8 bg-gradient-to-r from-blue-600 to-blue-800 rounded flex items-center justify-center">
-                                            <span class="text-white text-xs font-bold">VISA</span>
-                                        </div>
-                                        <div>
-                                            <p class="font-semibold">•••• •••• •••• 4242</p>
-                                            <p class="text-text-secondary text-sm">Expires 12/27</p>
-                                        </div>
-                                        <span class="bg-secondary text-black text-xs px-2 py-1 rounded-full font-medium">Default</span>
-                                    </div>
-                                    <div class="flex space-x-3">
-                                        <button class="btn-secondary">Edit</button>
-                                        <button class="btn-secondary">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- PayPal -->
-                            <div class="card">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="w-12 h-8 bg-blue-600 rounded flex items-center justify-center">
-                                            <span class="text-white text-xs font-bold">PP</span>
-                                        </div>
-                                        <div>
-                                            <p class="font-semibold">PayPal Account</p>
-                                            <p class="text-text-secondary text-sm">john.doe@email.com</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex space-x-3">
-                                        <button class="btn-secondary">Edit</button>
-                                        <button class="btn-secondary">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Add New Payment Method -->
-                            <div class="card border-2 border-dashed border-surface hover:border-secondary transition-colors duration-300 cursor-pointer">
-                                <div class="text-center py-8">
-                                    <div class="w-12 h-12 bg-surface rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                        </svg>
-                                    </div>
-                                    <h3 class="text-lg font-semibold mb-2">Add Payment Method</h3>
-                                    <p class="text-text-secondary">Add a new credit card or payment option</p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Preferences Section -->
-                    <section id="preferences" class="content-section hidden">
-                        <div class="mb-8">
-                            <h1 class="text-3xl font-bold mb-2">Preferences</h1>
-                            <p class="text-text-secondary">Customize your shopping experience and dietary preferences.</p>
-                        </div>
-
-                        <div class="space-y-6">
-                            <!-- Dietary Preferences -->
-                            <div class="card">
-                                <h2 class="text-xl font-semibold mb-4">Dietary Preferences</h2>
-                                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" checked class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary">
-                                        <span>Organic</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary">
-                                        <span>Vegetarian</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary">
-                                        <span>Vegan</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" checked class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary">
-                                        <span>Gluten-Free</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary">
-                                        <span>Keto</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary">
-                                        <span>Paleo</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Notification Preferences -->
-                            <div class="card">
-                                <h2 class="text-xl font-semibold mb-4">Notifications</h2>
-                                <div class="space-y-4">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <p class="font-medium">Order Updates</p>
-                                            <p class="text-text-secondary text-sm">Get notified about order status changes</p>
-                                        </div>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" checked class="sr-only peer">
-                                            <div class="w-11 h-6 bg-surface peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
-                                        </label>
-                                    </div>
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <p class="font-medium">Promotional Emails</p>
-                                            <p class="text-text-secondary text-sm">Receive deals and special offers</p>
-                                        </div>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" checked class="sr-only peer">
-                                            <div class="w-11 h-6 bg-surface peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
-                                        </label>
-                                    </div>
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <p class="font-medium">SMS Notifications</p>
-                                            <p class="text-text-secondary text-sm">Text messages for delivery updates</p>
-                                        </div>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" class="sr-only peer">
-                                            <div class="w-11 h-6 bg-surface peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Delivery Preferences -->
-                            <div class="card">
-                                <h2 class="text-xl font-semibold mb-4">Delivery Preferences</h2>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium mb-2">Preferred Delivery Time</label>
-                                        <select class="input-field w-full">
-                                            <option>Morning (8AM - 12PM)</option>
-                                            <option>Afternoon (12PM - 5PM)</option>
-                                            <option>Evening (5PM - 8PM)</option>
-                                            <option>No Preference</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-2">Special Instructions</label>
-                                        <textarea class="input-field w-full h-24 resize-none" placeholder="Leave at door, ring doorbell, etc.">Leave packages at the front door. Ring doorbell if signature required.</textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Loyalty Program Section -->
-                    <section id="loyalty" class="content-section hidden">
-                        <div class="mb-8">
-                            <h1 class="text-3xl font-bold mb-2">Loyalty Program</h1>
-                            <p class="text-text-secondary">Track your rewards and unlock exclusive benefits.</p>
-                        </div>
-
-                        <!-- Loyalty Status -->
-                        <div class="card mb-6">
-                            <div class="text-center mb-6">
-                                <div class="w-24 h-24 bg-gradient-to-r from-secondary to-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg class="w-12 h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                                    </svg>
-                                </div>
-                                <h2 class="text-2xl font-bold text-secondary mb-2">Gold Member</h2>
-                                <p class="text-text-secondary">You're earning 2x points on every purchase!</p>
-                            </div>
-
-                            <!-- Points Progress -->
-                            <div class="mb-6">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm font-medium">Current Points</span>
-                                    <span class="text-sm font-medium">2,450 / 5,000</span>
-                                </div>
-                                <div class="w-full bg-surface rounded-full h-3">
-                                    <div class="bg-gradient-to-r from-secondary to-accent h-3 rounded-full" style="width: 49%"></div>
-                                </div>
-                                <p class="text-text-secondary text-sm mt-2">2,550 points until Platinum status</p>
-                            </div>
-
-                            <!-- Benefits -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div class="text-center p-4 bg-background rounded-lg">
-                                    <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center mx-auto mb-2">
-                                        <span class="text-black font-bold text-sm">2x</span>
-                                    </div>
-                                    <p class="font-medium">Double Points</p>
-                                    <p class="text-text-secondary text-xs">On all purchases</p>
-                                </div>
-                                <div class="text-center p-4 bg-background rounded-lg">
-                                    <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center mx-auto mb-2">
-                                        <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                        </svg>
-                                    </div>
-                                    <p class="font-medium">Free Delivery</p>
-                                    <p class="text-text-secondary text-xs">On orders over $50</p>
-                                </div>
-                                <div class="text-center p-4 bg-background rounded-lg">
-                                    <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center mx-auto mb-2">
-                                        <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                    </div>
-                                    <p class="font-medium">Early Access</p>
-                                    <p class="text-text-secondary text-xs">To new products</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Rewards History -->
-                        <div class="card">
-                            <h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between p-3 bg-background rounded-lg">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
-                                            <span class="text-black text-xs font-bold">+</span>
-                                        </div>
-                                        <div>
-                                            <p class="font-medium">Points Earned</p>
-                                            <p class="text-text-secondary text-sm">Order #DD-2024-1156</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="font-semibold text-secondary">+179 pts</p>
-                                        <p class="text-text-secondary text-xs">Nov 10, 2025</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between p-3 bg-background rounded-lg">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-8 h-8 bg-warning rounded-full flex items-center justify-center">
-                                            <span class="text-black text-xs font-bold">-</span>
-                                        </div>
-                                        <div>
-                                            <p class="font-medium">Points Redeemed</p>
-                                            <p class="text-text-secondary text-sm">$10 off coupon</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="font-semibold text-warning">-500 pts</p>
-                                        <p class="text-text-secondary text-xs">Nov 5, 2025</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Security Section -->
-                    <section id="security" class="content-section hidden">
-                        <div class="mb-8">
-                            <h1 class="text-3xl font-bold mb-2">Account Security</h1>
-                            <p class="text-text-secondary">Manage your account security settings and privacy preferences.</p>
-                        </div>
-
-                        <div class="space-y-6">
-                            <!-- Account Information -->
-                            <div class="card">
-                                <h2 class="text-xl font-semibold mb-4">Account Information</h2>
-                                <div class="space-y-4">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-sm font-medium mb-2">First Name</label>
-                                            <input type="text" value="John" class="input-field w-full">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-2">Last Name</label>
-                                            <input type="text" value="Doe" class="input-field w-full">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-2">Email Address</label>
-                                        <input type="email" value="john.doe@email.com" class="input-field w-full">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-2">Phone Number</label>
-                                        <input type="tel" value="(555) 123-4567" class="input-field w-full">
-                                    </div>
-                                    <button class="btn-primary">Update Information</button>
-                                </div>
-                            </div>
-
-                            <!-- Password Security -->
-                            <div class="card">
-                                <h2 class="text-xl font-semibold mb-4">Password & Security</h2>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium mb-2">Current Password</label>
-                                        <input type="password" class="input-field w-full" placeholder="Enter current password">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-2">New Password</label>
-                                        <input type="password" class="input-field w-full" placeholder="Enter new password">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-2">Confirm New Password</label>
-                                        <input type="password" class="input-field w-full" placeholder="Confirm new password">
-                                    </div>
-                                    <button class="btn-primary">Change Password</button>
-                                </div>
-                            </div>
-
-                            <!-- Two-Factor Authentication -->
-                            <div class="card">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div>
-                                        <h2 class="text-xl font-semibold">Two-Factor Authentication</h2>
-                                        <p class="text-text-secondary text-sm">Add an extra layer of security to your account</p>
-                                    </div>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" class="sr-only peer">
-                                        <div class="w-11 h-6 bg-surface peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
-                                    </label>
-                                </div>
-                                <p class="text-text-secondary text-sm">When enabled, you'll need to enter a code from your phone in addition to your password.</p>
-                            </div>
-
-                            <!-- Login Activity -->
-                            <div class="card">
-                                <h2 class="text-xl font-semibold mb-4">Recent Login Activity</h2>
-                                <div class="space-y-3">
-                                    <div class="flex items-center justify-between p-3 bg-background rounded-lg">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
-                                                <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <p class="font-medium">Desktop - Chrome</p>
-                                                <p class="text-text-secondary text-sm">San Francisco, CA</p>
-                                            </div>
-                                        </div>
-                                        <div class="text-right">
-                                            <p class="text-secondary text-sm font-medium">Current Session</p>
-                                            <p class="text-text-secondary text-xs">Nov 13, 2025</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center justify-between p-3 bg-background rounded-lg">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="w-8 h-8 bg-surface rounded-full flex items-center justify-center">
-                                                <svg class="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <p class="font-medium">Mobile - Safari</p>
-                                                <p class="text-text-secondary text-sm">San Francisco, CA</p>
-                                            </div>
-                                        </div>
-                                        <div class="text-right">
-                                            <p class="text-text-secondary text-sm">Nov 12, 2025</p>
-                                            <p class="text-text-secondary text-xs">2:30 PM</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            </div>
+            <button
+              type="submit"
+              class="btn-primary text-xs px-4 py-2"
+            >
+              Save Address
+            </button>
+          </div>
         </div>
-    </main>
+      </form>
+    </div>
+  </div>
 
-    <!-- Footer -->
-    <footer class="bg-surface py-16">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Company Info -->
-                <div>
-                    <div class="flex items-center space-x-3 mb-6">
-                        <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center">
-                            <span class="text-black font-bold text-xl">D</span>
-                        </div>
-                        <span class="text-2xl font-bold">DealDrop</span>
-                    </div>
-                    <p class="text-text-secondary mb-4">Premium fresh groceries delivered to your door. Your health, our priority.</p>
-                    <div class="flex space-x-4">
-                        <a href="javascript:void(0)" class="text-text-secondary hover:text-secondary transition-colors duration-300">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                            </svg>
-                        </a>
-                        <a href="javascript:void(0)" class="text-text-secondary hover:text-secondary transition-colors duration-300">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
-                            </svg>
-                        </a>
-                        <a href="javascript:void(0)" class="text-text-secondary hover:text-secondary transition-colors duration-300">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001.012.001z"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+  <!-- ========= PAYMENT MODAL ========= -->
+<div id="paymentModalBackdrop"
+     class="fixed inset-0 bg-black/40 z-50 hidden flex items-start justify-center">
 
-                <!-- Quick Links -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-6">Quick Links</h3>
-                    <ul class="space-y-3">
-                        <li><a href="homepage.html" class="text-text-secondary hover:text-secondary transition-colors duration-300">Home</a></li>
-                        <li><a href="categories_page.html" class="text-text-secondary hover:text-secondary transition-colors duration-300">Categories</a></li>
-                        <li><a href="javascript:void(0)" class="text-text-secondary hover:text-secondary transition-colors duration-300">About Us</a></li>
-                        <li><a href="javascript:void(0)" class="text-text-secondary hover:text-secondary transition-colors duration-300">Contact</a></li>
-                    </ul>
-                </div>
+    <div class="card w-full max-w-2xl p-6 bg-background border border-surface rounded-xl shadow-xl"
+     style="margin-top: 190px; margin-left: 100px;">
 
-                <!-- Customer Service -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-6">Customer Service</h3>
-                    <ul class="space-y-3">
-                        <li><a href="javascript:void(0)" class="text-text-secondary hover:text-secondary transition-colors duration-300">Help Center</a></li>
-                        <li><a href="javascript:void(0)" class="text-text-secondary hover:text-secondary transition-colors duration-300">Shipping Info</a></li>
-                        <li><a href="javascript:void(0)" class="text-text-secondary hover:text-secondary transition-colors duration-300">Returns</a></li>
-                        <li><a href="user_account_dashboard.html" class="text-text-secondary hover:text-secondary transition-colors duration-300">My Account</a></li>
-                    </ul>
-                </div>
 
-                <!-- Contact Info -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-6">Contact Info</h3>
-                    <div class="space-y-3">
-                        <p class="text-text-secondary">📞 1-800-DEALDROP</p>
-                        <p class="text-text-secondary">✉️ hello@dealdrop.com</p>
-                        <p class="text-text-secondary">📍 123 Fresh Street, Organic City, OC 12345</p>
-                    </div>
-                </div>
-            </div>
 
-            <div class="border-t border-surface mt-12 pt-8 text-center">
-                <p class="text-text-secondary">© 2025 DealDrop. All Rights Reserved.</p>
-            </div>
+
+
+      <div class="flex items-center justify-between mb-4">
+        <h2 id="paymentModalTitle" class="text-lg font-semibold">
+          Add Payment Method
+        </h2>
+        <button
+          type="button"
+          class="text-text-secondary hover:text-secondary"
+          onclick="closePaymentModal()"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+      </div>
+
+      <form
+        id="paymentForm"
+        onsubmit="submitPaymentForm(event)"
+        class="space-y-4 text-sm"
+      >
+        <input type="hidden" id="paymentFormId" />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs mb-1">Method Type</label>
+            <select
+              id="paymentMethodType"
+              class="input-field w-full"
+            >
+              <option value="card">Card</option>
+              <option value="upi">UPI</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs mb-1">Provider</label>
+            <input
+              id="paymentProvider"
+              type="text"
+              class="input-field w-full"
+              placeholder="Bank / App name"
+            />
+          </div>
         </div>
-    </footer>
 
-    <script>
-        // Navigation functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const navItems = document.querySelectorAll('.nav-item');
-            const contentSections = document.querySelectorAll('.content-section');
+        <div id="cardFields" class="space-y-4">
+          <div>
+            <label class="block text-xs mb-1">Card Number</label>
+            <input
+              id="paymentCardNumber"
+              type="text"
+              class="input-field w-full"
+              placeholder="XXXX XXXX XXXX XXXX"
+            />
+          </div>
+          <div>
+            <label class="block text-xs mb-1">Expiry (MM/YY)</label>
+            <input
+              id="paymentCardExpiry"
+              type="text"
+              class="input-field w-full"
+              placeholder="MM/YY"
+            />
+          </div>
+        </div>
 
-            // Handle navigation clicks
-            navItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Remove active class from all nav items
-                    navItems.forEach(nav => {
-                        nav.classList.remove('active', 'bg-secondary/10', 'text-secondary');
-                        nav.classList.add('text-text-secondary');
-                    });
-                    
-                    // Add active class to clicked item
-                    this.classList.add('active', 'bg-secondary/10', 'text-secondary');
-                    this.classList.remove('text-text-secondary');
-                    
-                    // Hide all content sections
-                    contentSections.forEach(section => {
-                        section.classList.add('hidden');
-                    });
-                    
-                    // Show target section
-                    const targetId = this.getAttribute('href').substring(1);
-                    const targetSection = document.getElementById(targetId);
-                    if (targetSection) {
-                        targetSection.classList.remove('hidden');
-                    }
-                });
-            });
+        <div id="upiFields" class="space-y-4 hidden">
+          <div>
+            <label class="block text-xs mb-1">UPI ID</label>
+            <input
+              id="paymentUpiId"
+              type="text"
+              class="input-field w-full"
+              placeholder="yourname@bank"
+            />
+          </div>
+        </div>
 
-            // Handle hash navigation on page load
-            const hash = window.location.hash;
-            if (hash) {
-                const targetNav = document.querySelector(`a[href="${hash}"]`);
-                if (targetNav) {
-                    targetNav.click();
-                }
-            }
+        <div class="flex items-center justify-between pt-2">
+          <label class="flex items-center space-x-2 text-xs">
+            <input
+              id="paymentIsDefault"
+              type="checkbox"
+              class="w-4 h-4 text-secondary bg-surface border-surface rounded focus:ring-secondary"
+            />
+            <span>Set as default method</span>
+          </label>
 
-            // Mobile menu functionality
-            const mobileMenuButton = document.querySelector('.md\\:hidden button');
-            if (mobileMenuButton) {
-                mobileMenuButton.addEventListener('click', function() {
-                    console.log('Mobile menu clicked');
-                    // Mobile menu functionality would go here
-                });
-            }
+          <div class="space-x-2">
+            <button
+              type="button"
+              class="btn-secondary text-xs px-3 py-2"
+              onclick="closePaymentModal()"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn-primary text-xs px-4 py-2"
+            >
+              Save Method
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
 
-            // Form interactions
-            const toggleSwitches = document.querySelectorAll('input[type="checkbox"]');
-            toggleSwitches.forEach(toggle => {
-                toggle.addEventListener('change', function() {
-                    console.log('Toggle changed:', this.checked);
-                });
-            });
+  <!-- ================== FOOTER (unchanged design) ================== -->
+  <footer class="bg-surface py-16 mt-10">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-sm">
+        <!-- Company Info -->
+        <div>
+          <div class="flex items-center space-x-3 mb-6">
+            <div
+              class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center"
+            >
+              <span class="text-black font-bold text-xl">D</span>
+            </div>
+            <span class="text-2xl font-bold">DealDrop</span>
+          </div>
+          <p class="text-text-secondary mb-4">
+            Premium fresh groceries delivered to your door. Your
+            health, our priority.
+          </p>
+        </div>
 
-            // Button interactions
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    if (this.textContent.includes('Reorder')) {
-                        e.preventDefault();
-                        console.log('Reorder clicked');
-                        // Add reorder functionality
-                    } else if (this.textContent.includes('Track Order')) {
-                        e.preventDefault();
-                        console.log('Track order clicked');
-                        // Add order tracking functionality
-                    } else if (this.textContent.includes('Add to Cart')) {
-                        e.preventDefault();
-                        console.log('Add to cart clicked');
-                        // Add to cart functionality
-                    }
-                });
-            });
+        <!-- Quick Links -->
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Quick Links</h3>
+          <ul class="space-y-3">
+            <li>
+              <a
+                href="homepage.html"
+                class="text-text-secondary hover:text-secondary transition-colors duration-300"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                href="categories_page.html"
+                class="text-text-secondary hover:text-secondary transition-colors duration-300"
+                >Categories</a
+              >
+            </li>
+            <li>
+              <a
+                href="javascript:void(0)"
+                class="text-text-secondary hover:text-secondary transition-colors duration-300"
+                >About Us</a
+              >
+            </li>
+            <li>
+              <a
+                href="javascript:void(0)"
+                class="text-text-secondary hover:text-secondary transition-colors duration-300"
+                >Contact</a
+              >
+            </li>
+          </ul>
+        </div>
 
-            // Smooth scrolling for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target && !this.classList.contains('nav-item')) {
-                        e.preventDefault();
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
+        <!-- Customer Service -->
+        <div>
+          <h3 class="text-lg font-semibold mb-6">
+            Customer Service
+          </h3>
+          <ul class="space-y-3">
+            <li>
+              <a
+                href="javascript:void(0)"
+                class="text-text-secondary hover:text-secondary transition-colors duration-300"
+                >Help Center</a
+              >
+            </li>
+            <li>
+              <a
+                href="javascript:void(0)"
+                class="text-text-secondary hover:text-secondary transition-colors duration-300"
+                >Shipping Info</a
+              >
+            </li>
+            <li>
+              <a
+                href="javascript:void(0)"
+                class="text-text-secondary hover:text-secondary transition-colors duration-300"
+                >Returns</a
+              >
+            </li>
+            <li>
+              <a
+                href="user_account_dashboard.html"
+                class="text-text-secondary hover:text-secondary transition-colors duration-300"
+                >My Account</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <!-- Contact Info -->
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Contact Info</h3>
+          <div class="space-y-3 text-text-secondary">
+            <p>📞 1-800-DEALDROP</p>
+            <p>✉️ hello@dealdrop.com</p>
+            <p>📍 123 Fresh Street, Organic City, OC 12345</p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="border-t border-surface mt-12 pt-8 text-center text-xs text-text-secondary"
+      >
+        <p>© 2025 DealDrop. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ✅ JS WILL GO IN A <script> TAG HERE (SEE PART 2) -->
+
+</body>
+</html>
+
+
+  <!-- ================== PAGE SCRIPT (DB + NAV + CRUD) ================== -->
+<script>
+  // =============== SMALL HELPERS & GLOBAL STATE ===============
+  const formatINR = (n) =>
+    "₹" +
+    Number(n || 0).toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+  // global so modal handlers can use them
+  let accountApi = null;
+  let accountUser = null;
+  let accountFullName = "User";
+  let cachedAddresses = [];
+  let cachedPaymentMethods = [];
+
+  document.addEventListener("DOMContentLoaded", () => {
+    setupAccountNavigation();
+    setupPaymentTypeSwitcher();
+    initAccountPage().catch((err) =>
+      console.error("Account init error:", err)
+    );
+  });
+
+  // =============== NAVIGATION (UNCHANGED) ===============
+  function setupAccountNavigation() {
+    const navItems = document.querySelectorAll(".nav-item");
+    const sections = document.querySelectorAll(".content-section");
+
+    navItems.forEach((item) => {
+      item.addEventListener("click", (e) => {
+        e.preventDefault();
+        const targetId = item.getAttribute("href").substring(1);
+
+        // active nav
+        navItems.forEach((n) => {
+          n.classList.remove("active", "bg-secondary/10", "text-secondary");
+          n.classList.add("text-text-secondary");
         });
-    </script>
-<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+        item.classList.add("active", "bg-secondary/10", "text-secondary");
+        item.classList.remove("text-text-secondary");
+
+        // sections
+        sections.forEach((sec) => sec.classList.add("hidden"));
+        const targetSec = document.getElementById(targetId);
+        if (targetSec) targetSec.classList.remove("hidden");
+
+        // update hash
+        history.replaceState(null, "", "#" + targetId);
+      });
+    });
+
+    // initial hash
+    const hash = window.location.hash;
+    if (hash) {
+      const link = document.querySelector(`.nav-item[href="${hash}"]`);
+      if (link) link.click();
+    }
+  }
+
+  // toggle card/upi fields in payment modal
+  function setupPaymentTypeSwitcher() {
+    const sel = document.getElementById("paymentMethodType");
+    const cardFields = document.getElementById("cardFields");
+    const upiFields = document.getElementById("upiFields");
+    if (!sel || !cardFields || !upiFields) return;
+
+    const toggle = () => {
+      if (sel.value === "card") {
+        cardFields.classList.remove("hidden");
+        upiFields.classList.add("hidden");
+      } else {
+        cardFields.classList.add("hidden");
+        upiFields.classList.remove("hidden");
+      }
+    };
+
+    sel.addEventListener("change", toggle);
+    toggle();
+  }
+
+  // =============== MAIN INITIALISATION ===============
+  async function initAccountPage() {
+    if (typeof supabaseClient === "undefined") {
+      console.error(
+        "supabaseClient not found. Make sure dealdrop.js is loaded."
+      );
+      return;
+    }
+
+    const api = supabaseClient;
+    accountApi = api;
+
+    // 1. Get current user
+    const { data: userData, error: userErr } = await api.auth.getUser();
+    if (userErr) {
+      console.error("auth.getUser error:", userErr.message);
+    }
+    const authUser = userData?.user;
+    if (!authUser) {
+      window.location.href = "login.html";
+      return;
+    }
+    accountUser = authUser;
+
+    // 2. Get profile from users table
+    const {
+      data: profile,
+      error: profileErr,
+    } = await api
+      .from("users")
+      .select("id, full_name, username, email")
+      .eq("id", authUser.id)
+      .maybeSingle();
+
+    if (profileErr) {
+      console.error("profile error:", profileErr.message);
+    }
+
+    const fullName =
+      profile?.full_name || authUser.user_metadata?.full_name || "User";
+    const username =
+      profile?.username || authUser.user_metadata?.username || "";
+    const email = profile?.email || authUser.email || "";
+    const avatar =
+      profile?.avatar ||
+      authUser.user_metadata?.avatar_url ||
+      authUser.user_metadata?.picture ||
+      "";
+
+    accountFullName = fullName;
+
+    // Fill profile header
+    document.getElementById("profileName").textContent = fullName;
+    document.getElementById("profileEmail").textContent = email;
+    const avatarImg = document.getElementById("profileAvatar");
+    if (avatar && avatarImg) avatarImg.src = avatar;
+    const welcome = document.getElementById("overviewWelcome");
+    if (welcome)
+      welcome.textContent = `Welcome back, ${fullName.split(" ")[0]}!`;
+
+    // security card
+    const secFull = document.getElementById("sec_full_name");
+    const secUser = document.getElementById("sec_username");
+    const secEmail = document.getElementById("sec_email");
+    if (secFull) secFull.value = fullName;
+    if (secUser) secUser.value = username || "";
+    if (secEmail) secEmail.value = email || "";
+
+    // 3. Fetch everything in parallel
+    const [
+      ordersRes,
+      wishlistRes,
+      loyaltyRes,
+      addressesRes,
+      paymentRes,
+      prefsRes,
+      activityRes,
+      cartItemsRes,
+    ] = await Promise.all([
+      api
+        .from("orders")
+        .select("id, total_amount, status, created_at")
+        .eq("user_id", authUser.id)
+        .order("created_at", { ascending: false }),
+      api.from("wishlist").select("id").eq("user_id", authUser.id),
+      api
+        .from("loyalty_points")
+        .select("points")
+        .eq("user_id", authUser.id)
+        .maybeSingle(),
+      api
+        .from("addresses")
+        .select("*")
+        .eq("user_id", authUser.id)
+        .order("is_default", { ascending: false }),
+      api
+        .from("payment_methods")
+        .select("*")
+        .eq("user_id", authUser.id)
+        .order("is_default", { ascending: false }),
+      api
+        .from("user_preferences")
+        .select("*")
+        .eq("user_id", authUser.id)
+        .maybeSingle(),
+      api
+        .from("user_activity")
+        .select("*")
+        .eq("user_id", authUser.id)
+        .order("created_at", { ascending: false })
+        .limit(5),
+      api
+        .from("user_cart")
+        .select("id, user_cart_items(user_cart_items_quantity:quantity)")
+        .eq("user_id", authUser.id)
+        .maybeSingle(),
+    ]);
+
+    const orders = ordersRes?.data || [];
+    const wishlist = wishlistRes?.data || [];
+    const loyalty = loyaltyRes?.data || null;
+    cachedAddresses = addressesRes?.data || [];
+    cachedPaymentMethods = paymentRes?.data || [];
+    const prefs = prefsRes?.data || null;
+    const activity = activityRes?.data || [];
+
+    // 4. Cart glowing dot
+    const cartDot = document.getElementById("cartDot");
+    let cartCount = 0;
+    if (cartItemsRes?.data?.user_cart_items) {
+      cartCount = cartItemsRes.data.user_cart_items.reduce(
+        (s, it) => s + Number(it.user_cart_items_quantity || 0),
+        0
+      );
+    }
+    if (cartDot) {
+      cartDot.classList.toggle("hidden", cartCount === 0);
+    }
+
+    // 5. Stats
+    const totalOrders = orders.length;
+    const totalSpent = orders.reduce(
+      (sum, o) => sum + Number(o.total_amount || 0),
+      0
+    );
+    const wishlistCount = wishlist.length;
+    const points = loyalty?.points || 0;
+
+    document.getElementById("statTotalOrders").textContent = totalOrders;
+    document.getElementById("statTotalSpent").textContent =
+      formatINR(totalSpent);
+    document.getElementById("statWishlistCount").textContent =
+      wishlistCount;
+    document.getElementById("statLoyaltyPoints").textContent = points;
+
+    // membership tier
+    const membershipLabel = document.getElementById("membershipLabel");
+    const loyaltyTierLabel = document.getElementById("loyaltyTierLabel");
+    const loyaltyTierDescription = document.getElementById(
+      "loyaltyTierDescription"
+    );
+    let tier = "Member";
+    let nextTarget = 500;
+    if (points >= 5000) {
+      tier = "Platinum";
+      nextTarget = points + 1000;
+    } else if (points >= 2500) {
+      tier = "Gold";
+      nextTarget = 5000;
+    } else if (points >= 1000) {
+      tier = "Silver";
+      nextTarget = 2500;
+    }
+
+    if (membershipLabel) membershipLabel.textContent = `${tier} Status`;
+    if (loyaltyTierLabel) loyaltyTierLabel.textContent = `${tier} Member`;
+    if (loyaltyTierDescription)
+      loyaltyTierDescription.textContent =
+        tier === "Platinum"
+          ? "You unlock the best of DealDrop."
+          : "You're earning bonus points on each order.";
+
+    const loyaltyProgressBar =
+      document.getElementById("loyaltyProgressBar");
+    const loyaltyProgressLabel =
+      document.getElementById("loyaltyProgressLabel");
+    const loyaltyNextLabel = document.getElementById("loyaltyNextLabel");
+
+    const progressPercent = Math.min(
+      100,
+      (points / nextTarget) * 100 || 0
+    );
+    if (loyaltyProgressBar)
+      loyaltyProgressBar.style.width = progressPercent + "%";
+    if (loyaltyProgressLabel)
+      loyaltyProgressLabel.textContent = `${points} / ${nextTarget}`;
+    if (loyaltyNextLabel)
+      loyaltyNextLabel.textContent = `${
+        Math.max(0, nextTarget - points) || 0
+      } points until next level`;
+
+    // 6. Recent orders (overview)
+    const recentOrdersList = document.getElementById("recentOrdersList");
+    if (recentOrdersList) {
+      recentOrdersList.innerHTML = "";
+
+      if (!orders.length) {
+        recentOrdersList.innerHTML =
+          '<p class="text-text-secondary text-sm">You have no orders yet.</p>';
+      } else {
+        orders.slice(0, 2).forEach((o) => {
+          const div = document.createElement("div");
+          div.className =
+            "flex items-center justify-between p-4 bg-background rounded-lg";
+          div.innerHTML = `
+            <div>
+              <p class="font-semibold text-text-primary text-sm">Order #DD-${o.id}</p>
+              <p class="text-xs text-text-secondary">
+                ${new Date(o.created_at).toLocaleDateString()} • ${
+            o.status || "pending"
+          }
+              </p>
+            </div>
+            <div class="text-right">
+              <p class="text-base font-semibold text-secondary">${formatINR(
+                o.total_amount
+              )}</p>
+              <p class="text-xs text-text-secondary capitalize">${
+                o.status || "pending"
+              }</p>
+            </div>
+          `;
+          recentOrdersList.appendChild(div);
+        });
+      }
+    }
+
+    // 7. Order history
+    const orderHistoryList = document.getElementById("orderHistoryList");
+    if (orderHistoryList) {
+      orderHistoryList.innerHTML = "";
+      if (!orders.length) {
+        orderHistoryList.innerHTML =
+          '<p class="text-text-secondary text-sm">No orders yet.</p>';
+      } else {
+        orders.forEach((o) => {
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <p class="font-semibold text-text-primary">
+                  Order #DD-${o.id}
+                </p>
+                <p class="text-xs text-text-secondary">
+                  Placed ${new Date(o.created_at).toLocaleString()}
+                </p>
+              </div>
+              <div class="text-right">
+                <p class="text-lg font-semibold text-secondary">${formatINR(
+                  o.total_amount
+                )}</p>
+                <p class="text-xs capitalize ${
+                  o.status === "delivered"
+                    ? "text-secondary"
+                    : o.status === "in_transit"
+                    ? "text-warning"
+                    : "text-text-secondary"
+                }">${o.status || "pending"}</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-between border-t border-surface pt-3">
+              <button class="btn-secondary text-xs px-3 py-1">View Details</button>
+              <button class="btn-primary text-xs px-3 py-1">Reorder</button>
+            </div>
+          `;
+          orderHistoryList.appendChild(div);
+        });
+      }
+    }
+
+    // 8. Addresses (NEW RENDER)
+    renderAddressesSection();
+
+    // 9. Payment methods (NEW RENDER)
+    renderPaymentMethodsSection();
+
+    // 10. Preferences load
+    if (prefs) {
+      document.getElementById("pref_organic").checked =
+        !!prefs.prefers_organic;
+      document.getElementById("pref_vegetarian").checked =
+        !!prefs.vegetarian;
+      document.getElementById("pref_vegan").checked = !!prefs.vegan;
+      document.getElementById("pref_gluten_free").checked =
+        !!prefs.gluten_free;
+      document.getElementById("pref_keto").checked = !!prefs.keto;
+      document.getElementById("pref_paleo").checked = !!prefs.paleo;
+      document.getElementById("pref_notify_orders").checked =
+        !!prefs.notify_orders;
+      document.getElementById("pref_notify_promotions").checked =
+        !!prefs.notify_promotions;
+      document.getElementById("pref_notify_sms").checked =
+        !!prefs.notify_sms;
+      document.getElementById("pref_delivery_time").value =
+        prefs.delivery_time || "No Preference";
+      document.getElementById("pref_special_instructions").value =
+        prefs.special_instructions || "";
+    }
+
+    const savePrefsBtn = document.getElementById("savePreferencesBtn");
+    if (savePrefsBtn) {
+      savePrefsBtn.addEventListener("click", async () => {
+        const body = {
+          prefers_organic:
+            document.getElementById("pref_organic").checked,
+          vegetarian:
+            document.getElementById("pref_vegetarian").checked,
+          vegan: document.getElementById("pref_vegan").checked,
+          gluten_free:
+            document.getElementById("pref_gluten_free").checked,
+          keto: document.getElementById("pref_keto").checked,
+          paleo: document.getElementById("pref_paleo").checked,
+          notify_orders:
+            document.getElementById("pref_notify_orders").checked,
+          notify_promotions:
+            document.getElementById("pref_notify_promotions").checked,
+          notify_sms:
+            document.getElementById("pref_notify_sms").checked,
+          delivery_time:
+            document.getElementById("pref_delivery_time").value,
+          special_instructions:
+            document.getElementById("pref_special_instructions").value,
+          updated_at: new Date().toISOString(),
+        };
+
+        let err;
+        if (prefs) {
+          const { error } = await api
+            .from("user_preferences")
+            .update(body)
+            .eq("user_id", authUser.id);
+          err = error;
+        } else {
+          const { error } = await api
+            .from("user_preferences")
+            .insert({ user_id: authUser.id, ...body });
+          err = error;
+        }
+
+        const msg = document.getElementById("prefsSavedMessage");
+        if (err) {
+          console.error("preferences error:", err.message);
+          if (msg) {
+            msg.textContent = "Failed to save preferences.";
+            msg.classList.remove("hidden");
+            msg.classList.remove("text-secondary");
+            msg.classList.add("text-error");
+          }
+        } else if (msg) {
+          msg.textContent = "Preferences updated!";
+          msg.classList.remove("hidden");
+          msg.classList.remove("text-error");
+          msg.classList.add("text-secondary");
+          setTimeout(() => msg.classList.add("hidden"), 2200);
+        }
+      });
+    }
+
+    // 11. Loyalty recent activity
+    const loyaltyActivityList =
+      document.getElementById("loyaltyActivityList");
+    if (loyaltyActivityList) {
+      loyaltyActivityList.innerHTML = "";
+      if (!orders.length) {
+        loyaltyActivityList.innerHTML =
+          '<p class="text-text-secondary text-sm">No loyalty activity yet.</p>';
+      } else {
+        orders.slice(0, 3).forEach((o) => {
+          const ptsEarned = Math.round(o.total_amount || 0);
+          const div = document.createElement("div");
+          div.className =
+            "flex items-center justify-between p-3 bg-background rounded-lg";
+          div.innerHTML = `
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                <span class="text-black text-xs font-bold">+</span>
+              </div>
+              <div>
+                <p class="font-medium text-text-primary text-xs">Points Earned</p>
+                <p class="text-text-secondary text-[11px]">Order #DD-${o.id}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-semibold text-secondary text-sm">+${ptsEarned} pts</p>
+              <p class="text-text-secondary text-[11px]">${new Date(
+                o.created_at
+              ).toLocaleDateString()}</p>
+            </div>
+          `;
+          loyaltyActivityList.appendChild(div);
+        });
+      }
+    }
+
+    // 12. Security – login activity
+    const loginActivityList = document.getElementById("loginActivityList");
+    if (loginActivityList) {
+      loginActivityList.innerHTML = "";
+      if (!activity.length) {
+        loginActivityList.innerHTML =
+          '<p class="text-text-secondary text-sm">No recent login activity recorded.</p>';
+      } else {
+        activity.forEach((a, idx) => {
+          const div = document.createElement("div");
+          const isCurrent = !!a.is_current_session && idx === 0;
+          div.className =
+            "flex items-center justify-between p-3 bg-background rounded-lg";
+          div.innerHTML = `
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 ${
+                isCurrent ? "bg-secondary" : "bg-surface"
+              } rounded-full flex items-center justify-center">
+                <svg class="w-4 h-4 ${
+                  isCurrent ? "text-black" : "text-text-secondary"
+                }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                  </path>
+                </svg>
+              </div>
+              <div>
+                <p class="font-medium text-text-primary text-xs">${
+                  a.device || "Device"
+                } - ${a.browser || "Browser"}</p>
+                <p class="text-text-secondary text-[11px]">${
+                  a.location || "Unknown location"
+                }</p>
+              </div>
+            </div>
+            <div class="text-right">
+              ${
+                isCurrent
+                  ? '<p class="text-secondary text-[11px] font-medium">Current Session</p>'
+                  : ""
+              }
+              <p class="text-text-secondary text-[11px]">${new Date(
+                a.created_at
+              ).toLocaleString()}</p>
+            </div>
+          `;
+          loginActivityList.appendChild(div);
+        });
+      }
+    }
+
+    // 13. Sign out
+    const signOutBtn = document.getElementById("signOutBtn");
+    if (signOutBtn) {
+      signOutBtn.addEventListener("click", async () => {
+        await api.auth.signOut();
+        window.location.href = "landing_page.html";
+      });
+    }
+  }
+
+  // =============== ADDRESSES: RENDER + MODAL + CRUD ===============
+function renderAddressesSection() {
+  const addressesList = document.getElementById("addressesList");
+  if (!addressesList) return;
+
+  addressesList.innerHTML = "";
+
+  if (!cachedAddresses.length) {
+    addressesList.innerHTML = `
+      <div class="card border-2 border-dashed border-surface text-center cursor-pointer hover:border-secondary"
+           onclick="openAddressModal()">
+        <div class="py-10 flex flex-col items-center">
+          <div class="w-8 h-8 rounded-full bg-surface flex items-center justify-center mb-4">
+            <span class="text-secondary text-2xl">+</span>
+          </div>
+          <h3 class="text-base font-semibold mb-2">Add Your First Address</h3>
+        </div>
+      </div>`;
+    return;
+  }
+
+  cachedAddresses.forEach((addr) => {
+    const card = document.createElement("div");
+    card.className = "card relative p-5";
+
+    card.innerHTML = `
+      ${addr.is_default ? `
+      <span class="absolute -top-2 left-4 bg-secondary text-black text-[10px] px-2 py-[2px] rounded-full font-medium shadow">
+        Default
+      </span>` : ""}
+
+      <div class="flex justify-between items-start">
+
+        <!-- LEFT SIDE CONTENT -->
+        <div class="text-xs text-text-secondary space-y-1">
+          <p>${addr.full_name}</p>
+          <p>${addr.address_line1}</p>
+          ${addr.address_line2 ? `<p>${addr.address_line2}</p>` : ""}
+          <p>${addr.city}, ${addr.state} ${addr.postal_code}</p>
+          <p>${addr.country}</p>
+          <p class="mt-2">Phone: ${addr.phone}</p>
+        </div>
+
+        <!-- RIGHT SIDE BUTTONS (NO OVERLAP) -->
+        <div class="flex flex-col gap-2 ml-4">
+
+          <button type="button"
+            onclick="editAddress(${addr.id})"
+            class="px-3 py-1 rounded bg-surface hover:bg-secondary/20 
+                   text-text-secondary hover:text-secondary text-xs">
+            ✏ Edit
+          </button>
+
+          <button type="button"
+            onclick="deleteAddress(${addr.id})"
+            class="px-3 py-1 rounded bg-surface hover:bg-red-500/20 
+                   text-text-secondary hover:text-error text-xs">
+            🗑 Delete
+          </button>
+
+        </div>
+      </div>
+    `;
+
+    addressesList.appendChild(card);
+  });
+
+  // Add new card
+  const addCard = document.createElement("div");
+  addCard.className =
+    "card border-2 border-dashed border-surface hover:border-secondary cursor-pointer flex items-center justify-center";
+  addCard.onclick = openAddressModal;
+  addCard.innerHTML = `
+    <div class="text-center py-8">
+      <div class="w-8 h-8 bg-surface rounded-full flex items-center justify-center mx-auto mb-3">
+        <span class="text-secondary text-2xl">+</span>
+      </div>
+      <h3 class="text-base font-semibold">Add Address</h3>
+    </div>`;
+  
+  addressesList.appendChild(addCard);
+}
+
+  function openAddressModal(id) {
+    const backdrop = document.getElementById("addressModalBackdrop");
+    if (!backdrop) return;
+
+    const titleEl = document.getElementById("addressModalTitle");
+    const idInput = document.getElementById("addressFormId");
+    const fullNameInput = document.getElementById("addressFullName");
+    const phoneInput = document.getElementById("addressPhone");
+    const line1Input = document.getElementById("addressLine1");
+    const line2Input = document.getElementById("addressLine2");
+    const cityInput = document.getElementById("addressCity");
+    const stateInput = document.getElementById("addressState");
+    const postalInput = document.getElementById("addressPostalCode");
+    const countryInput = document.getElementById("addressCountry");
+    const isDefaultInput = document.getElementById("addressIsDefault");
+
+    if (id) {
+      const addr = cachedAddresses.find((a) => a.id === id);
+      if (!addr) return;
+      if (titleEl) titleEl.textContent = "Edit Address";
+      if (idInput) idInput.value = id;
+      if (fullNameInput) fullNameInput.value = addr.full_name || "";
+      if (phoneInput) phoneInput.value = addr.phone || "";
+      if (line1Input) line1Input.value = addr.address_line1 || "";
+      if (line2Input) line2Input.value = addr.address_line2 || "";
+      if (cityInput) cityInput.value = addr.city || "";
+      if (stateInput) stateInput.value = addr.state || "";
+      if (postalInput) postalInput.value = addr.postal_code || "";
+      if (countryInput) countryInput.value = addr.country || "India";
+      if (isDefaultInput) isDefaultInput.checked = !!addr.is_default;
+    } else {
+      if (titleEl) titleEl.textContent = "Add New Address";
+      if (idInput) idInput.value = "";
+      if (fullNameInput) fullNameInput.value = accountFullName || "";
+      if (phoneInput) phoneInput.value = "";
+      if (line1Input) line1Input.value = "";
+      if (line2Input) line2Input.value = "";
+      if (cityInput) cityInput.value = "";
+      if (stateInput) stateInput.value = "";
+      if (postalInput) postalInput.value = "";
+      if (countryInput) countryInput.value = "India";
+      if (isDefaultInput) isDefaultInput.checked =
+        !cachedAddresses.length; // first one default
+    }
+
+    backdrop.classList.remove("hidden");
+    backdrop.classList.add("flex");
+  }
+
+  function closeAddressModal() {
+    const backdrop = document.getElementById("addressModalBackdrop");
+    if (!backdrop) return;
+    backdrop.classList.add("hidden");
+    backdrop.classList.remove("flex");
+  }
+
+  async function submitAddressForm(event) {
+  event.preventDefault();
+  if (!accountApi || !accountUser) return;
+
+  const line1 = document.getElementById("addressLine1").value.trim();
+  const city  = document.getElementById("addressCity").value.trim();
+  const state = document.getElementById("addressState").value.trim();
+  const postal = document.getElementById("addressPostalCode").value.trim();
+
+  const idVal = document.getElementById("addressFormId").value || "";
+
+  // ❌ Prevent duplicate same address:
+  
+  // Prevent exact duplicate full address
+const dupAddress = cachedAddresses.find(a =>
+  a.address_line1 === line1 &&
+  a.city === city &&
+  a.state === state &&
+  a.postal_code === postal &&
+  a.id != idVal
+);
+
+if (dupAddress) {
+  alert("This address already exists.");
+  return;
+}
+
+
+  let body = {
+    full_name: document.getElementById("addressFullName").value.trim(),
+    phone: document.getElementById("addressPhone").value.trim(),
+    address_line1: line1,
+    address_line2: document.getElementById("addressLine2").value.trim() || null,
+    city, state, postal_code: postal,
+    country: "India",
+    is_default: document.getElementById("addressIsDefault").checked,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (body.is_default) {
+    await accountApi.from("addresses")
+      .update({ is_default: false })
+      .eq("user_id", accountUser.id);
+  }
+
+  let error;
+
+  if (idVal) {
+    const { error: err } = await accountApi
+      .from("addresses")
+      .update(body)
+      .eq("id", idVal)
+      .eq("user_id", accountUser.id);
+    error = err;
+  } else {
+    const { error: err } = await accountApi
+      .from("addresses")
+      .insert({ ...body });  // user_id auto-fills from RLS default
+
+    error = err;
+  }
+
+  if (error) {
+    alert("Failed to save address");
+    console.error(error);
+    return;
+  }
+
+  await reloadAddresses();
+  closeAddressModal();
+}
+
+  async function reloadAddresses() {
+    if (!accountApi || !accountUser) return;
+    const { data, error } = await accountApi
+      .from("addresses")
+      .select("*")
+      .eq("user_id", accountUser.id)
+      .order("is_default", { ascending: false });
+    if (error) {
+      console.error("reloadAddresses error:", error.message);
+      return;
+    }
+    cachedAddresses = data || [];
+    renderAddressesSection();
+  }
+
+  function editAddress(id) {
+    openAddressModal(id);
+  }
+
+  async function deleteAddress(id) {
+    if (!accountApi || !accountUser) return;
+    const confirmDelete = confirm("Delete this address?");
+    if (!confirmDelete) return;
+
+    const { error } = await accountApi
+      .from("addresses")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", accountUser.id);
+    if (error) {
+      console.error("deleteAddress error:", error.message);
+      alert("Failed to delete address.");
+      return;
+    }
+    await reloadAddresses();
+  }
+
+  // =============== PAYMENT METHODS: RENDER + MODAL + CRUD ===============
+function renderPaymentMethodsSection() {
+  const pmList = document.getElementById("paymentMethodsList");
+  if (!pmList) return;
+
+  pmList.innerHTML = "";
+
+  if (!cachedPaymentMethods.length) {
+    pmList.innerHTML = `
+      <div class="card border-2 border-dashed border-surface text-center cursor-pointer hover:border-secondary"
+           onclick="openPaymentModal()">
+        <div class="py-10 flex flex-col items-center justify-center">
+          <div class="w-8 h-8 rounded-full bg-surface flex items-center justify-center mb-4">
+            <span class="text-secondary text-2xl">+</span>
+          </div>
+          <h3 class="text-base font-semibold mb-2">Add Payment Method</h3>
+        </div>
+      </div>`;
+    return;
+  }
+
+  cachedPaymentMethods.forEach(pm => {
+    const div = document.createElement("div");
+    div.className = "card relative p-5";
+
+    const label = pm.method_type === "upi" ? "UPI" : "CARD";
+    const value = pm.card_last4 ? `•••• •••• •••• ${pm.card_last4}` : pm.upi_id;
+
+    div.innerHTML = `
+      ${pm.is_default ? `
+      <span class="absolute -top-2 left-4 bg-secondary text-black text-[10px] px-2 py-[2px] rounded-full shadow">
+        Default
+      </span>` : ""}
+
+      <div class="flex justify-between items-start">
+
+        <!-- LEFT CONTENT -->
+        <div class="flex items-center space-x-4">
+          <div class="w-12 h-10 bg-blue-600 rounded text-white flex items-center justify-center text-xs font-bold">
+            ${label}
+          </div>
+
+          <div class="text-xs text-text-secondary space-y-1">
+            <p class="font-semibold text-text-primary">${value}</p>
+            ${pm.card_expiry ? `<p class="text-text-secondary text-[11px]">Exp: ${pm.card_expiry}</p>` : ""}
+            ${pm.provider ? `<p class="text-text-secondary text-[11px]">${pm.provider}</p>` : ""}
+          </div>
+        </div>
+
+        <!-- RIGHT BUTTONS (NO OVERLAP) -->
+        <div class="flex flex-col gap-2 ml-4">
+
+          <button type="button"
+            onclick="editPaymentMethod(${pm.id})"
+            class="px-3 py-1 rounded bg-surface hover:bg-secondary/20 
+                   text-text-secondary hover:text-secondary text-xs">
+            ✏ Edit
+          </button>
+
+          <button type="button"
+            onclick="deletePaymentMethod(${pm.id})"
+            class="px-3 py-1 rounded bg-surface hover:bg-red-500/20 
+                   text-text-secondary hover:text-error text-xs">
+            🗑 Delete
+          </button>
+
+        </div>
+      </div>
+    `;
+
+    pmList.appendChild(div);
+  });
+
+  // ADD NEW CARD BUTTON CARD
+  const addDiv = document.createElement("div");
+  addDiv.className =
+    "card border-2 border-dashed border-surface cursor-pointer hover:border-secondary flex items-center justify-center";
+  addDiv.onclick = openPaymentModal;
+  addDiv.innerHTML = `
+    <div class="py-8 text-center">
+      <div class="w-8 h-8 rounded-full bg-surface mx-auto flex items-center justify-center mb-3">
+        <span class="text-secondary text-2xl">+</span>
+      </div>
+      <h3 class="text-base font-semibold">Add Payment Method</h3>
+    </div>`;
+  
+  pmList.appendChild(addDiv);
+}
+
+  function openPaymentModal(id) {
+    const backdrop = document.getElementById("paymentModalBackdrop");
+    if (!backdrop) return;
+
+    const titleEl = document.getElementById("paymentModalTitle");
+    const idInput = document.getElementById("paymentFormId");
+    const typeSel = document.getElementById("paymentMethodType");
+    const providerInput = document.getElementById("paymentProvider");
+    const cardNumberInput = document.getElementById("paymentCardNumber");
+    const cardExpiryInput = document.getElementById("paymentCardExpiry");
+    const upiInput = document.getElementById("paymentUpiId");
+    const isDefaultInput = document.getElementById("paymentIsDefault");
+
+    if (id) {
+      const pm = cachedPaymentMethods.find((p) => p.id === id);
+      if (!pm) return;
+
+      if (titleEl) titleEl.textContent = "Edit Payment Method";
+      if (idInput) idInput.value = id;
+      if (typeSel) typeSel.value = pm.method_type || "card";
+      if (providerInput) providerInput.value = pm.provider || "";
+      if (cardNumberInput)
+        cardNumberInput.value = pm.card_last4
+          ? "************" + pm.card_last4
+          : "";
+      if (cardExpiryInput)
+        cardExpiryInput.value = pm.card_expiry || "";
+      if (upiInput) upiInput.value = pm.upi_id || "";
+      if (isDefaultInput) isDefaultInput.checked = !!pm.is_default;
+    } else {
+      if (titleEl) titleEl.textContent = "Add Payment Method";
+      if (idInput) idInput.value = "";
+      if (typeSel) typeSel.value = "card";
+      if (providerInput) providerInput.value = "";
+      if (cardNumberInput) cardNumberInput.value = "";
+      if (cardExpiryInput) cardExpiryInput.value = "";
+      if (upiInput) upiInput.value = "";
+      if (isDefaultInput)
+        isDefaultInput.checked = !cachedPaymentMethods.length;
+    }
+
+    setupPaymentTypeSwitcher(); // refresh fields visibility
+
+    backdrop.classList.remove("hidden");
+    backdrop.classList.add("flex");
+  }
+
+  function closePaymentModal() {
+    const backdrop = document.getElementById("paymentModalBackdrop");
+    if (!backdrop) return;
+    backdrop.classList.add("hidden");
+    backdrop.classList.remove("flex");
+  }
+
+async function submitPaymentForm(event) {
+  event.preventDefault();
+  if (!accountApi || !accountUser) return;
+
+  const idVal = document.getElementById("paymentFormId").value || "";
+  const methodType = document.getElementById("paymentMethodType").value.trim();
+  const provider = document.getElementById("paymentProvider").value.trim();
+  const cardNumber = document.getElementById("paymentCardNumber").value.replace(/\s+/g, "");
+  const cardExpiry = document.getElementById("paymentCardExpiry").value.trim();
+  const upiId = document.getElementById("paymentUpiId").value.trim();
+  const isDefault = document.getElementById("paymentIsDefault").checked;
+  // ✅ Prevent duplicates ONLY within same type
+let duplicate = null;
+
+if (methodType === "upi") {
+  duplicate = cachedPaymentMethods.find(pm =>
+    pm.upi_id === upiId && pm.id != idVal
+  );
+}
+
+if (methodType === "card") {
+  duplicate = cachedPaymentMethods.find(pm =>
+    pm.card_last4 === cardNumber.slice(-4) && pm.id != idVal
+  );
+}
+
+if (duplicate) {
+  alert("This payment method already exists.");
+  return;
+}
+
+
+  // ====== VALIDATION (required by your table schema) ======
+  if (!methodType) {
+    alert("Payment type is required.");
+    return;
+  }
+
+  let body = {
+    method_type: methodType,
+    provider: provider || null,
+    is_default: isDefault
+  };
+
+  // ====== CARD MODE ======
+  if (methodType === "card") {
+    if (!cardNumber || cardNumber.length < 4) {
+      alert("Enter a valid card number.");
+      return;
+    }
+    if (!cardExpiry) {
+      alert("Enter card expiry date.");
+      return;
+    }
+    body.card_last4 = cardNumber.slice(-4);
+    body.card_expiry = cardExpiry;
+    body.upi_id = null;
+  }
+
+  // ====== UPI MODE ======
+  if (methodType === "upi") {
+    if (!upiId) {
+      alert("Enter UPI ID.");
+      return;
+    }
+    body.upi_id = upiId;
+    body.card_last4 = null;
+    body.card_expiry = null;
+  }
+
+  // ====== Prevent duplicate methods ======
+ 
+
+  // ====== Ensure only ONE default method ======
+  if (isDefault) {
+    await accountApi
+      .from("payment_methods")
+      .update({ is_default: false })
+      .eq("user_id", accountUser.id);
+  }
+
+  let response;
+
+  // ====== UPDATE ======
+  if (idVal) {
+    response = await accountApi
+      .from("payment_methods")
+      .update(body)
+      .eq("id", Number(idVal))
+      .eq("user_id", accountUser.id);
+  }
+
+  // ====== INSERT ======
+  else {
+    response = await accountApi
+      .from("payment_methods")
+      .insert({
+        
+        ...body
+      });
+  }
+
+  console.log("PAYMENT SAVE RESPONSE:", response);
+
+  if (response.error) {
+    console.error("SAVE ERROR:", response.error);
+    alert("Failed to save payment method.\n" + response.error.message);
+    return;
+  }
+  
+
+  await reloadPaymentMethods();
+  closePaymentModal();
+}
+
+  async function reloadPaymentMethods() {
+    if (!accountApi || !accountUser) return;
+    const { data, error } = await accountApi
+      .from("payment_methods")
+      .select("*")
+      .eq("user_id", accountUser.id)
+      .order("is_default", { ascending: false });
+    if (error) {
+      console.error("reloadPaymentMethods error:", error.message);
+      return;
+    }
+    cachedPaymentMethods = data || [];
+    renderPaymentMethodsSection();
+  }
+
+  function editPaymentMethod(id) {
+    openPaymentModal(id);
+  }
+
+  async function deletePaymentMethod(id) {
+    if (!accountApi || !accountUser) return;
+    const confirmDelete = confirm("Delete this payment method?");
+    if (!confirmDelete) return;
+
+    const { error } = await accountApi
+      .from("payment_methods")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", accountUser.id);
+    if (error) {
+      console.error("deletePaymentMethod error:", error.message);
+      alert("Failed to delete payment method.");
+      return;
+    }
+    await reloadPaymentMethods();
+  }
+</script>
+
 </body>
 </html>
