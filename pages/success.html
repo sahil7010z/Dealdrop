@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Success - DealDrop</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/dealdrop.js"></script>
+</head>
+<body class="bg-background text-text-primary">
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-surface">
+        <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center">
+                    <span class="text-black font-bold text-xl">D</span>
+                </div>
+                <span class="text-2xl font-bold text-text-primary">DealDrop</span>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="homepage.html" class="text-text-secondary hover:text-secondary transition-colors duration-300">Home</a>
+                <a href="categories_page.html" class="text-text-secondary hover:text-secondary transition-colors duration-300">Categories</a>
+                <a href="user_account_dashboard.html" class="text-secondary font-semibold">My Account</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden text-text-primary">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20 min-h-screen flex items-center justify-center">
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-2xl mx-auto text-center">
+                <!-- Success Icon -->
+                <div class="w-24 h-24 bg-secondary rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_25px_rgba(18,245,159,0.5)]">
+                    <svg class="w-12 h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+
+                <!-- Success Message -->
+                <h1 class="text-4xl font-bold mb-4 text-secondary">Payment Successful!</h1>
+                <p class="text-xl text-text-secondary mb-8">
+                    Thank you for your purchase. Your order has been confirmed.
+                </p>
+
+                <!-- Order Details -->
+                <div class="card mb-8 text-left">
+                    <h2 class="text-xl font-semibold mb-4">Order Details</h2>
+                    <div id="orderDetails" class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-text-secondary">Order ID:</span>
+                            <span id="orderId" class="font-medium">Loading...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-text-secondary">Product:</span>
+                            <span id="productName" class="font-medium">Loading...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-text-secondary">Amount:</span>
+                            <span id="orderAmount" class="font-medium text-secondary">Loading...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-text-secondary">Status:</span>
+                            <span class="font-medium text-success">Confirmed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subscription Info (if applicable) -->
+                <div id="subscriptionInfo" class="card mb-8 text-left hidden">
+                    <h2 class="text-xl font-semibold mb-4">Subscription Details</h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-text-secondary">Plan:</span>
+                            <span id="subscriptionPlan" class="font-medium">Loading...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-text-secondary">Next Billing:</span>
+                            <span id="nextBilling" class="font-medium">Loading...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-text-secondary">Status:</span>
+                            <span class="font-medium text-success">Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="homepage.html" class="btn-primary">
+                        Continue Shopping
+                    </a>
+                    <a href="user_account_dashboard.html" class="btn-secondary">
+                        View Account
+                    </a>
+                </div>
+
+                <!-- Additional Info -->
+                <div class="mt-8 p-4 bg-surface/50 rounded-lg">
+                    <p class="text-sm text-text-secondary">
+                        You will receive an email confirmation shortly. If you have any questions, 
+                        please contact our support team.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex items-center justify-center space-x-3 mb-4">
+                <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                    <span class="text-black font-bold">D</span>
+                </div>
+                <span class="text-xl font-bold">DealDrop</span>
+            </div>
+            <p class="text-text-secondary text-sm">
+                © 2025 DealDrop. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Get session_id from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session_id');
+
+            if (!sessionId) {
+                // Redirect to homepage if no session ID
+                window.location.href = 'homepage.html';
+                return;
+            }
+
+            try {
+                // Check if user is authenticated
+                if (typeof supabaseClient === 'undefined') {
+                    throw new Error('Supabase client not initialized');
+                }
+
+                const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+                
+                if (authError || !user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Display session ID as order ID for now
+                document.getElementById('orderId').textContent = sessionId;
+
+                // Try to get order details from URL parameters or local storage
+                const productName = urlParams.get('product') || localStorage.getItem('lastOrderProduct') || 'Product';
+                const amount = urlParams.get('amount') || localStorage.getItem('lastOrderAmount') || '0';
+                const mode = urlParams.get('mode') || localStorage.getItem('lastOrderMode') || 'payment';
+
+                document.getElementById('productName').textContent = productName;
+                document.getElementById('orderAmount').textContent = `₹${amount}`;
+
+                // Show subscription info if it's a subscription
+                if (mode === 'subscription') {
+                    const subscriptionInfo = document.getElementById('subscriptionInfo');
+                    subscriptionInfo.classList.remove('hidden');
+                    
+                    document.getElementById('subscriptionPlan').textContent = productName;
+                    
+                    // Calculate next billing date (30 days from now for demo)
+                    const nextBillingDate = new Date();
+                    nextBillingDate.setDate(nextBillingDate.getDate() + 30);
+                    document.getElementById('nextBilling').textContent = nextBillingDate.toLocaleDateString();
+                }
+
+                // Clear stored order data
+                localStorage.removeItem('lastOrderProduct');
+                localStorage.removeItem('lastOrderAmount');
+                localStorage.removeItem('lastOrderMode');
+
+            } catch (error) {
+                console.error('Error loading success page:', error);
+                // Still show the page but with limited info
+                document.getElementById('orderId').textContent = sessionId;
+                document.getElementById('productName').textContent = 'Product';
+                document.getElementById('orderAmount').textContent = 'N/A';
+            }
+        });
+    </script>
+</body>
+</html>
